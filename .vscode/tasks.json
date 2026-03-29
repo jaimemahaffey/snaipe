@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-solution",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build", "${workspaceFolder}/Snaipe.sln", "--no-restore"],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "build-inspector",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build", "${workspaceFolder}/src/Snaipe.Inspector/Snaipe.Inspector.csproj", "--no-restore"],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build-sampleapp",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build", "${workspaceFolder}/samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj", "--no-restore"],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}

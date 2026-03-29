@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Inspector",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-inspector",
+      "program": "${workspaceFolder}/src/Snaipe.Inspector/bin/Debug/net9.0/Snaipe.Inspector.dll",
+      "cwd": "${workspaceFolder}/src/Snaipe.Inspector",
+      "console": "integratedTerminal",
+      "stopAtEntry": false,
+      "env": {
+        "UNO_LINUX_FB_RENDERER": "wayland"
+      }
+    },
+    {
+      "name": "Run SampleApp",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-sampleapp",
+      "program": "${workspaceFolder}/samples/Snaipe.SampleApp/bin/Debug/net9.0/Snaipe.SampleApp.dll",
+      "cwd": "${workspaceFolder}/samples/Snaipe.SampleApp",
+      "console": "integratedTerminal",
+      "stopAtEntry": false,
+      "env": {
+        "UNO_LINUX_FB_RENDERER": "wayland"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "SampleApp + Inspector (Both)",
+      "configurations": ["Run SampleApp", "Run Inspector"],
+      "stopAll": true
+    }
+  ]
+}

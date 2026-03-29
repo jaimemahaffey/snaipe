@@ -1,3 +1,5 @@
+using Uno.UI.Hosting;
+
 namespace Snaipe.Inspector;
 
 public static class Program
@@ -5,7 +7,11 @@ public static class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        // TODO: initialize Uno Skia host and launch inspector UI
-        Console.WriteLine("Snaipe Inspector — not yet wired up.");
+        var host = UnoPlatformHostBuilder.Create()
+            .App(() => new App())
+            .UseX11()
+            .Build();
+
+        host.Run();
     }
 }

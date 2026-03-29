@@ -27,6 +27,15 @@ public sealed class PropertyEntry
     public required string Category { get; init; }
     public string? ValueType { get; init; }
     public string? Value { get; init; }
+    /// <summary>
+    /// Hint for Inspector editors: "String", "Number", "Boolean", "Color", "Thickness", "Enum", "Object".
+    /// </summary>
+    public string ValueKind { get; init; } = "Object";
     public bool IsReadOnly { get; init; }
     public string? BindingExpression { get; init; }
+    /// <summary>
+    /// Populated when ValueKind is "Enum". Contains all valid enum member names so the Inspector
+    /// can render a ComboBox instead of a free-text field.
+    /// </summary>
+    public List<string>? EnumValues { get; init; }
 }
