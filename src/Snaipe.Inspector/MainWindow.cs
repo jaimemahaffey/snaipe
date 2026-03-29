@@ -370,7 +370,11 @@ public sealed partial class MainWindow : Window
                 "Common" => 0,
                 "Layout" => 1,
                 "Appearance" => 2,
-                _ => 3,
+                "Data Context" => 3,
+                "Visual States" => 4,
+                "Style" => 5,
+                "Template" => 6,
+                _ => 7,
             });
 
         foreach (var group in groups)
