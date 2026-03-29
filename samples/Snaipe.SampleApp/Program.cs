@@ -110,6 +110,42 @@ public class App : Application
         };
         controlsPanel.Children.Add(slider);
 
+        // Styled button — exercises explicit Style detection
+        var styledButtonStyle = new Style(typeof(Button));
+        styledButtonStyle.Setters.Add(new Setter(Control.ForegroundProperty,
+            new SolidColorBrush(Windows.UI.Color.FromArgb(0xFF, 0xBF, 0x61, 0x6A))));
+        styledButtonStyle.Setters.Add(new Setter(Control.FontSizeProperty, 18.0));
+        var styledButton = new Button
+        {
+            Content = "Styled Button",
+            Name = "StyledButton",
+            Style = styledButtonStyle,
+        };
+        controlsPanel.Children.Add(styledButton);
+
+        // DataContext panel — exercises Local and Inherited DataContext detection
+        var dataContextPanel = new StackPanel
+        {
+            Name = "DataContextPanel",
+            DataContext = new { UserName = "Alice", Role = "Admin" },
+            Spacing = 4,
+        };
+        var dcLabel = new TextBlock
+        {
+            Text = "DataContext inherited below:",
+            Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xFF, 0xEB, 0xCB, 0x8B)),
+            Name = "DataContextLabel",
+        };
+        var dcChild = new TextBlock
+        {
+            Text = "I inherit DataContext from parent",
+            Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xFF, 0xD8, 0xDE, 0xE9)),
+            Name = "DataContextChild",
+        };
+        dataContextPanel.Children.Add(dcLabel);
+        dataContextPanel.Children.Add(dcChild);
+        controlsPanel.Children.Add(dataContextPanel);
+
         root.Children.Add(controlsPanel);
 
         // ListView with data

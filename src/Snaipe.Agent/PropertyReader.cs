@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Reflection;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 
@@ -62,6 +63,10 @@ public static class PropertyReader
         }
 
         entries.AddRange(GetAttachedProperties(element));
+        entries.AddRange(GetDataContextEntries(element));
+        entries.AddRange(GetVisualStateEntries(element));
+        entries.AddRange(GetStyleEntries(element));
+        entries.AddRange(GetTemplateEntries(element));
 
         return entries;
     }
@@ -234,7 +239,7 @@ public static class PropertyReader
     /// Formats a <see cref="BindingExpression"/> as a Binding markup-extension string,
     /// including Mode and ElementName when they differ from their defaults.
     /// </summary>
-    private static string FormatBindingExpression(BindingExpression be)
+    internal static string FormatBindingExpression(BindingExpression be)
     {
         var binding = be.ParentBinding;
         if (binding is null) return "{Binding}";
@@ -255,6 +260,277 @@ public static class PropertyReader
             parts.Add($"ElementName={elementName}");
 
         return parts.Count == 0 ? "{Binding}" : $"{{Binding {string.Join(", ", parts)}}}";
+    }
+
+    private static List<Protocol.PropertyEntry> GetDataContextEntries(DependencyObject element)
+    {
+        var results = new List<Protocol.PropertyEntry>();
+        if (element is not FrameworkElement fe) return results;
+
+        try
+        {
+            var dcValue = fe.DataContext;
+            var localValue = fe.ReadLocalValue(FrameworkElement.DataContextProperty);
+
+            string source;
+            string? bindingExpr = null;
+            if (localValue == DependencyProperty.UnsetValue)
+                source = dcValue is not null ? "Inherited" : "Unset";
+            else if (localValue is BindingExpression be)
+            {
+                source = "Bound";
+                bindingExpr = FormatBindingExpression(be);
+            }
+            else
+                source = "Local";
+
+            results.Add(new Protocol.PropertyEntry
+            {
+                Name = "Source",
+                Category = "Data Context",
+                ValueType = "String",
+                Value = source,
+                ValueKind = "String",
+                IsReadOnly = true,
+            });
+
+            if (dcValue is not null)
+            {
+                results.Add(new Protocol.PropertyEntry
+                {
+                    Name = "Type",
+                    Category = "Data Context",
+                    ValueType = "String",
+                    Value = dcValue.GetType().Name,
+                    ValueKind = "String",
+                    IsReadOnly = true,
+                });
+                results.Add(new Protocol.PropertyEntry
+                {
+                    Name = "Value",
+                    Category = "Data Context",
+                    ValueType = "String",
+                    Value = dcValue.ToString() ?? "(null)",
+                    ValueKind = "String",
+                    IsReadOnly = true,
+                });
+            }
+
+            if (bindingExpr is not null)
+            {
+                results.Add(new Protocol.PropertyEntry
+                {
+                    Name = "Binding",
+                    Category = "Data Context",
+                    ValueType = "String",
+                    Value = bindingExpr,
+                    ValueKind = "String",
+                    IsReadOnly = true,
+                });
+            }
+        }
+        catch { /* DataContext read may fail on some elements */ }
+
+        return results;
+    }
+
+    private static List<Protocol.PropertyEntry> GetVisualStateEntries(DependencyObject element)
+    {
+        var results = new List<Protocol.PropertyEntry>();
+        if (element is not FrameworkElement fe) return results;
+
+        try
+        {
+            var groups = VisualStateManager.GetVisualStateGroups(fe);
+            if (groups is null || groups.Count == 0) return results;
+
+            foreach (var group in groups)
+            {
+                results.Add(new Protocol.PropertyEntry
+                {
+                    Name = group.Name,
+                    Category = "Visual States",
+                    ValueType = "VisualStateGroup",
+                    Value = group.CurrentState?.Name ?? "(none)",
+                    ValueKind = "String",
+                    IsReadOnly = true,
+                });
+
+                var stateNames = string.Join(", ", group.States.Select(s => s.Name));
+                if (!string.IsNullOrEmpty(stateNames))
+                {
+                    results.Add(new Protocol.PropertyEntry
+                    {
+                        Name = $"{group.Name}.States",
+                        Category = "Visual States",
+                        ValueType = "String",
+                        Value = stateNames,
+                        ValueKind = "String",
+                        IsReadOnly = true,
+                    });
+                }
+            }
+        }
+        catch { /* Element may not support visual state groups */ }
+
+        return results;
+    }
+
+    private static List<Protocol.PropertyEntry> GetStyleEntries(DependencyObject element)
+    {
+        var results = new List<Protocol.PropertyEntry>();
+        if (element is not FrameworkElement fe) return results;
+
+        var style = fe.Style;
+        if (style is null)
+        {
+            if (element is Control)
+            {
+                var defaultKeyProp = typeof(Control).GetProperty("DefaultStyleKey",
+                    BindingFlags.NonPublic | BindingFlags.Instance);
+                var defaultKey = defaultKeyProp?.GetValue(element);
+                results.Add(new Protocol.PropertyEntry
+                {
+                    Name = "Source",
+                    Category = "Style",
+                    ValueType = "String",
+                    Value = defaultKey is not null ? $"Default ({defaultKey})" : "None",
+                    ValueKind = "String",
+                    IsReadOnly = true,
+                });
+            }
+            return results;
+        }
+
+        results.Add(new Protocol.PropertyEntry
+        {
+            Name = "Source",
+            Category = "Style",
+            ValueType = "String",
+            Value = "Explicit",
+            ValueKind = "String",
+            IsReadOnly = true,
+        });
+
+        if (style.TargetType is not null)
+        {
+            results.Add(new Protocol.PropertyEntry
+            {
+                Name = "TargetType",
+                Category = "Style",
+                ValueType = "String",
+                Value = style.TargetType.Name,
+                ValueKind = "String",
+                IsReadOnly = true,
+            });
+        }
+
+        // Walk BasedOn chain
+        int depth = 0;
+        var current = style;
+        while (current is not null)
+        {
+            foreach (var setter in current.Setters.OfType<Setter>())
+            {
+                try
+                {
+                    var propName = setter.Property?.ToString() ?? "?";
+                    var dpName = setter.Property is DependencyProperty dp
+                        ? FindDependencyPropertyName(dp, style.TargetType) ?? propName
+                        : propName;
+
+                    results.Add(new Protocol.PropertyEntry
+                    {
+                        Name = depth == 0 ? $"Setter: {dpName}" : $"BasedOn[{depth}]: {dpName}",
+                        Category = "Style",
+                        ValueType = setter.Value?.GetType().Name ?? "Object",
+                        Value = FormatValue(setter.Value),
+                        ValueKind = "String",
+                        IsReadOnly = true,
+                    });
+                }
+                catch { }
+            }
+
+            current = current.BasedOn;
+            depth++;
+            if (depth > 10) break; // Safety limit
+        }
+
+        return results;
+    }
+
+    private static string? FindDependencyPropertyName(DependencyProperty dp, Type? targetType)
+    {
+        if (targetType is null) return null;
+        var current = targetType;
+        while (current is not null && current != typeof(object))
+        {
+            foreach (var field in current.GetFields(BindingFlags.Public | BindingFlags.Static))
+            {
+                if (field.FieldType == typeof(DependencyProperty) &&
+                    field.GetValue(null) == dp &&
+                    field.Name.EndsWith("Property"))
+                {
+                    return field.Name[..^"Property".Length];
+                }
+            }
+            current = current.BaseType;
+        }
+        return null;
+    }
+
+    private static List<Protocol.PropertyEntry> GetTemplateEntries(DependencyObject element)
+    {
+        var results = new List<Protocol.PropertyEntry>();
+
+        if (element is Control ctrl && ctrl.Template is not null)
+        {
+            results.Add(new Protocol.PropertyEntry
+            {
+                Name = "ControlTemplate",
+                Category = "Template",
+                ValueType = "ControlTemplate",
+                Value = ctrl.Template.TargetType?.Name ?? "(set)",
+                ValueKind = "String",
+                IsReadOnly = true,
+            });
+        }
+
+        if (element is ContentPresenter cp && cp.ContentTemplate is not null)
+        {
+            string? rootType = null;
+            if (VisualTreeHelper.GetChildrenCount(cp) > 0)
+            {
+                var child = VisualTreeHelper.GetChild(cp, 0);
+                rootType = child.GetType().Name;
+            }
+
+            results.Add(new Protocol.PropertyEntry
+            {
+                Name = "ContentTemplate",
+                Category = "Template",
+                ValueType = "DataTemplate",
+                Value = rootType is not null ? $"Root: {rootType}" : "(set)",
+                ValueKind = "String",
+                IsReadOnly = true,
+            });
+        }
+
+        if (element is ItemsControl ic && ic.ItemTemplate is not null)
+        {
+            results.Add(new Protocol.PropertyEntry
+            {
+                Name = "ItemTemplate",
+                Category = "Template",
+                ValueType = "DataTemplate",
+                Value = "(set)",
+                ValueKind = "String",
+                IsReadOnly = true,
+            });
+        }
+
+        return results;
     }
 
     private record struct DependencyPropertyInfo(
