@@ -39,3 +39,6 @@ Thumbs.db
 
 ## Publish
 publish/
+
+## AI Assistants
+.claude/
