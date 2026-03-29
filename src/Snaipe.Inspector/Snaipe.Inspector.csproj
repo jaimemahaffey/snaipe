@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Snaipe.Inspector</RootNamespace>
+    <Description>Standalone visual tree inspector UI for Uno Skia Desktop apps</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Snaipe.Protocol\Snaipe.Protocol.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Uno.WinUI" Version="6.5.153" />
+    <PackageReference Include="Uno.WinUI.Skia.X11" Version="6.5.153" />
+    <PackageReference Include="Uno.WinUI.Skia.Linux.FrameBuffer" Version="6.5.153" />
+  </ItemGroup>
+
+  <!-- Windows-only: Skia WPF host -->
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <PackageReference Include="Uno.WinUI.Skia.Wpf" Version="6.5.153" />
+  </ItemGroup>
+
+</Project>
