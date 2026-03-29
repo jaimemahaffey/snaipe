@@ -7,8 +7,11 @@
       "request": "launch",
       "preLaunchTask": "build-inspector",
       "program": "${workspaceFolder}/src/Snaipe.Inspector/bin/Debug/net9.0/Snaipe.Inspector.dll",
+      "windows": {
+        "program": "${workspaceFolder}/src/Snaipe.Inspector/bin/Debug/net9.0-windows/Snaipe.Inspector.dll"
+      },
       "cwd": "${workspaceFolder}/src/Snaipe.Inspector",
-      "console": "integratedTerminal",
+      "console": "internalConsole",
       "stopAtEntry": false,
       "env": {
         "UNO_LINUX_FB_RENDERER": "wayland"
@@ -20,8 +23,11 @@
       "request": "launch",
       "preLaunchTask": "build-sampleapp",
       "program": "${workspaceFolder}/samples/Snaipe.SampleApp/bin/Debug/net9.0/Snaipe.SampleApp.dll",
+      "windows": {
+        "program": "${workspaceFolder}/samples/Snaipe.SampleApp/bin/Debug/net9.0-windows/Snaipe.SampleApp.dll"
+      },
       "cwd": "${workspaceFolder}/samples/Snaipe.SampleApp",
-      "console": "integratedTerminal",
+      "console": "internalConsole",
       "stopAtEntry": false,
       "env": {
         "UNO_LINUX_FB_RENDERER": "wayland"
@@ -31,7 +37,10 @@
   "compounds": [
     {
       "name": "SampleApp + Inspector (Both)",
-      "configurations": ["Run SampleApp", "Run Inspector"],
+      "configurations": [
+        "Run SampleApp",
+        "Run Inspector"
+      ],
       "stopAll": true
     }
   ]

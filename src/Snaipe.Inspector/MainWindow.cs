@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Snaipe.Protocol;
+using System.IO;
 
 namespace Snaipe.Inspector;
 
@@ -17,7 +18,7 @@ public sealed partial class MainWindow : Window
     private ElementNode? _currentTree;
     private string? _selectedElementId;
 
-    private static readonly string LogFile = "/tmp/snaipe-inspector.log";
+    private static readonly string LogFile = Path.Combine(Path.GetTempPath(), "snaipe-inspector.log");
 
     private static void Log(string msg)
     {

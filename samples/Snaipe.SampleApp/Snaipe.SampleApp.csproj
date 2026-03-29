@@ -6,6 +6,11 @@
     <Description>Minimal Uno Skia Desktop app for testing Snaipe</Description>
   </PropertyGroup>
 
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\Snaipe.Agent\Snaipe.Agent.csproj" />
   </ItemGroup>
@@ -15,9 +20,9 @@
     <PackageReference Include="Uno.WinUI.Skia.X11" Version="6.5.153" />
   </ItemGroup>
 
-  <!-- Windows-only: Skia WPF host -->
+  <!-- Windows-only: native Win32 Skia host (Uno 6+) -->
   <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
-    <PackageReference Include="Uno.WinUI.Skia.Wpf" Version="6.5.153" />
+    <PackageReference Include="Uno.WinUI.Runtime.Skia.Win32" Version="6.5.153" />
   </ItemGroup>
 
 </Project>

@@ -14,13 +14,16 @@ Build a cross-platform visual tree inspector (like WPF Snoop) for Uno Platform d
 
 ## 📝 Recent Progress
 * Researched how to detect advanced XAML concepts within Uno/WinUI (Triggers, Styles, Templates, DataContext). 
-* Specifically documented that `VisualStateManager` handles triggers, `Style.BasedOn` handles inheritance, templates are read from the visual tree root under a `ContentPresenter`, and `ReadLocalValue` determines DataContext inheritance.
 * Saved implementation details to `docs/uno_ui_detection.md`.
+* Scaffolded the standalone `Snaipe.Inspector` UI (`MainWindow`) and `AgentDiscoveryScanner`.
+* Scaffolded `InspectorIpcClient` for Named Pipes transport.
+* Fixed C# compilation errors (missing `using System.IO;`) and `.csproj` misconfigurations (`net9.0-windows`) to successfully build both projects on Windows.
 
 ## 🚧 Next Steps
 - [ ] Incorporate the UI detection research (VisualState, DataContext) into the `PropertyReader` and `VisualTreeWalker` of `Snaipe.Agent`.
-- [ ] Implement the IPC transport layer (Named Pipes) between Agent and Inspector.
-- [ ] Scaffold the standalone `Snaipe.Inspector` UI.
+- [x] Implement the IPC transport layer (Named Pipes) between Agent and Inspector.
+- [x] Scaffold the standalone `Snaipe.Inspector` UI.
+- [ ] Test integration between Agent and Inspector by launching the SampleApp and attaching Inspector.
 
 ## ❌ Failed Attempts / Lessons Learned
 *(Agent: Log any dead-ends, library failures, or architectural pivots here so future agents don't make the same mistakes)*
