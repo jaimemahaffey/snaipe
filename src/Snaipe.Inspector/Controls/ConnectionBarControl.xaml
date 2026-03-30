@@ -19,7 +19,7 @@
                 Command="{x:Bind ViewModel.RefreshAgentsCommand}"/>
 
         <Button x:Name="ConnectButton"
-                Content="{x:Bind ConnectButtonLabel, Mode=OneWay}"
+                Content="{x:Bind ViewModel.ConnectButtonLabel, Mode=OneWay}"
                 Command="{x:Bind ViewModel.ConnectCommand}"/>
 
         <Button Content="Disconnect"

@@ -14,6 +14,7 @@ public sealed class MainViewModel : ViewModelBase
     private TreeNodeViewModel? _selectedNode;
     private string _statusMessage = "Ready";
     private bool _isLoadingProperties;
+    private string _connectButtonLabel = "Connect";
 
     public MainViewModel()
     {
@@ -41,6 +42,8 @@ public sealed class MainViewModel : ViewModelBase
 
     // ── State properties ──────────────────────────────────────────────────────
     public bool IsConnected => _state == ConnectionState.Connected;
+
+    public string ConnectButtonLabel { get => _connectButtonLabel; private set => SetField(ref _connectButtonLabel, value); }
 
     public string StatusMessage
     {
@@ -87,6 +90,7 @@ public sealed class MainViewModel : ViewModelBase
         DisconnectCommand.RaiseCanExecuteChanged();
         RefreshTreeCommand.RaiseCanExecuteChanged();
         OnPropertyChanged(nameof(IsConnected));
+        ConnectButtonLabel = _state == ConnectionState.Connected ? "Connected" : "Connect";
     }
 
     private void ClearSession()

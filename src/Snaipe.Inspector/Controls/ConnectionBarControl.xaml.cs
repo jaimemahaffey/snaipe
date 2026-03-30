@@ -13,8 +13,4 @@ public sealed partial class ConnectionBarControl : UserControl
     }
 
     public MainViewModel ViewModel => (MainViewModel)DataContext;
-
-    // Switches label based on connection state for the Connect button.
-    public string ConnectButtonLabel =>
-        ViewModel?.IsConnected == true ? "Connected" : "Connect";
 }
