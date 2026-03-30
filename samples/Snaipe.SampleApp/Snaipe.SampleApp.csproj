@@ -25,4 +25,11 @@
     <PackageReference Include="Uno.WinUI.Runtime.Skia.Win32" Version="6.5.153" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Page Include="MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
 </Project>
