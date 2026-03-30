@@ -54,7 +54,13 @@ public sealed record PropertiesResponse : InspectorMessage
     public List<PropertyEntry> Properties { get; init; } = [];
 }
 
-public sealed record AckResponse : InspectorMessage;
+public sealed record AckResponse : InspectorMessage
+{
+    /// <summary>
+    /// The final value as applied by the agent (e.g. "10.0" if user typed "10")
+    /// </summary>
+    public string? NormalizedValue { get; init; }
+}
 
 public sealed record ErrorResponse : InspectorMessage
 {
