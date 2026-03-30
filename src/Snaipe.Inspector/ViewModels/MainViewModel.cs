@@ -214,7 +214,103 @@ public sealed class MainViewModel : ViewModelBase
             StatusMessage = $"Tree error: {ex.Message}";
         }
     }
-    private Task OnSelectedNodeChangedAsync(TreeNodeViewModel? node) => Task.CompletedTask; // wired in Task 6
-    public Task SetPropertyAsync(string elementId, string propertyName, string newValue,
-        PropertyRowViewModel row) => Task.CompletedTask; // wired in Task 6
+    private async Task OnSelectedNodeChangedAsync(TreeNodeViewModel? node)
+    {
+        PropertyGroups.Clear();
+        if (node is null || _state != ConnectionState.Connected) return;
+
+        IsLoadingProperties = true;
+        try
+        {
+            var response = await _client.SendAsync<PropertiesResponse>(
+                new GetPropertiesRequest
+                {
+                    MessageId = Guid.NewGuid().ToString("N"),
+                    ElementId = node.Node.Id,
+                });
+
+            var orderedGroups = response.Properties
+                .GroupBy(p => p.Category)
+                .OrderBy(g => CategoryOrder(g.Key));
+
+            foreach (var group in orderedGroups)
+            {
+                var groupVm = new PropertyGroupViewModel(group.Key);
+                foreach (var prop in group.OrderBy(p => p.Name))
+                    groupVm.Properties.Add(new PropertyRowViewModel(prop,
+                        row => SetPropertyAsync(node.Node.Id, row.Entry.Name, row.EditValue, row)));
+                PropertyGroups.Add(groupVm);
+            }
+
+            // Fire-and-forget highlight — best effort, never crashes the Inspector.
+            _ = SendHighlightAsync(node.Node.Id, show: true);
+        }
+        catch (IOException ex)
+        {
+            HandleConnectionLost(ex.Message);
+        }
+        catch (SnaipeProtocolException ex) when (ex.ErrorCode == ErrorCodes.ElementNotFound)
+        {
+            StatusMessage = "Element no longer in tree — refresh the tree.";
+        }
+        finally
+        {
+            IsLoadingProperties = false;
+        }
+    }
+
+    public async Task SetPropertyAsync(string elementId, string propertyName, string newValue,
+        PropertyRowViewModel row)
+    {
+        try
+        {
+            var response = await _client.SendAsync<PropertiesResponse>(
+                new SetPropertyRequest
+                {
+                    MessageId = Guid.NewGuid().ToString("N"),
+                    ElementId = elementId,
+                    PropertyName = propertyName,
+                    NewValue = newValue,
+                });
+
+            row.ClearError();
+            // Refresh the row's displayed value with what the agent confirmed.
+            var updated = response.Properties.FirstOrDefault(p => p.Name == propertyName);
+            if (updated is not null)
+                row.EditValue = updated.Value ?? string.Empty;
+        }
+        catch (SnaipeProtocolException ex) when (ex.ErrorCode == ErrorCodes.PropertyReadOnly)
+        {
+            row.SetError("Property is read-only.");
+        }
+        catch (SnaipeProtocolException ex) when (ex.ErrorCode == ErrorCodes.InvalidPropertyValue)
+        {
+            row.SetError($"Cannot parse value: {ex.Details ?? ex.Message}");
+        }
+        catch (SnaipeProtocolException ex)
+        {
+            row.SetError(ex.Message);
+        }
+        catch (IOException ex)
+        {
+            HandleConnectionLost(ex.Message);
+        }
+    }
+
+    private async Task SendHighlightAsync(string elementId, bool show)
+    {
+        try
+        {
+            await _client.SendRawAsync(new HighlightElementRequest
+            {
+                MessageId = Guid.NewGuid().ToString("N"),
+                ElementId = elementId,
+                Show = show,
+            });
+        }
+        catch
+        {
+            // Best effort — highlight failures are non-fatal.
+        }
+    }
 }
