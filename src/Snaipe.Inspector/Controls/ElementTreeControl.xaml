@@ -17,12 +17,10 @@
 
         <TreeView x:Name="ElementTree"
                   Grid.Row="1"
-                  SelectionMode="Single"
-                  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+                  SelectionMode="Single">
             <TreeView.ItemTemplate>
-                <DataTemplate x:DataType="vm:TreeNodeViewModel">
-                    <TextBlock Text="{Binding DisplayName}"
-                               Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                <DataTemplate>
+                    <TextBlock Text="{Binding Content.DisplayName}"
                                FontSize="12"/>
                 </DataTemplate>
             </TreeView.ItemTemplate>
