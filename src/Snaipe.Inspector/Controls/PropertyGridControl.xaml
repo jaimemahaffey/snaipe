@@ -44,8 +44,9 @@
 
             <local:PropertyEditorTemplateSelector.EnumTemplate>
                 <DataTemplate x:DataType="vm:PropertyRowViewModel">
-                    <TextBox Text="{x:Bind EditValue, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                             FontSize="12"/>
+                    <ComboBox ItemsSource="{Binding Entry.EnumValues}"
+                              SelectedItem="{Binding EditValue, Mode=TwoWay}"
+                              FontSize="12"/>
                 </DataTemplate>
             </local:PropertyEditorTemplateSelector.EnumTemplate>
         </local:PropertyEditorTemplateSelector>
