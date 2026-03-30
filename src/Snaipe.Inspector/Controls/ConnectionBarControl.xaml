@@ -1,0 +1,33 @@
+<UserControl
+    x:Class="Snaipe.Inspector.Controls.ConnectionBarControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <StackPanel Orientation="Horizontal"
+                Padding="8"
+                Spacing="8">
+
+        <ComboBox x:Name="AgentDropdown"
+                  MinWidth="320"
+                  PlaceholderText="Select an agent..."
+                  ItemsSource="{x:Bind ViewModel.DiscoveredAgents, Mode=OneWay}"
+                  SelectedItem="{x:Bind ViewModel.SelectedAgent, Mode=TwoWay}"
+                  DisplayMemberPath="DisplayName"/>
+
+        <Button Content="⟳"
+                ToolTipService.ToolTip="Refresh agent list"
+                Command="{x:Bind ViewModel.RefreshAgentsCommand}"/>
+
+        <Button x:Name="ConnectButton"
+                Content="{x:Bind ViewModel.ConnectButtonLabel, Mode=OneWay}"
+                Command="{x:Bind ViewModel.ConnectCommand}"/>
+
+        <Button Content="Disconnect"
+                IsEnabled="{x:Bind ViewModel.IsConnected, Mode=OneWay}"
+                Command="{x:Bind ViewModel.DisconnectCommand}"/>
+
+        <ProgressRing Width="20" Height="20"
+                      IsActive="{x:Bind ViewModel.IsLoadingProperties, Mode=OneWay}"/>
+
+    </StackPanel>
+</UserControl>

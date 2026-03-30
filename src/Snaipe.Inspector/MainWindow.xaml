@@ -1,0 +1,61 @@
+<!-- src/Snaipe.Inspector/MainWindow.xaml -->
+<Window
+    x:Class="Snaipe.Inspector.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Snaipe.Inspector.Controls">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Connection bar -->
+        <controls:ConnectionBarControl Grid.Row="0"/>
+
+        <!-- Main split: tree | property+preview -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300" MinWidth="150"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" MinWidth="200"/>
+            </Grid.ColumnDefinitions>
+
+            <controls:ElementTreeControl Grid.Column="0"/>
+
+            <Border Grid.Column="1"
+                    Width="4"
+                    Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"/>
+
+            <!-- Right pane: property grid over preview -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="160" MinHeight="80"/>
+                </Grid.RowDefinitions>
+
+                <controls:PropertyGridControl Grid.Row="0"/>
+
+                <Border Grid.Row="1"
+                        Height="4"
+                        Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"/>
+
+                <controls:PreviewPaneControl Grid.Row="2"/>
+            </Grid>
+        </Grid>
+
+        <!-- Status bar -->
+        <Border Grid.Row="2" Padding="8,4">
+            <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
+                       FontSize="12"
+                       TextTrimming="CharacterEllipsis"/>
+        </Border>
+    </Grid>
+</Window>
