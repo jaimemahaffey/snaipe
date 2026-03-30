@@ -221,26 +221,23 @@ public sealed class SnaipeAgent : IDisposable
                     return;
                 }
 
-                var error = PropertyWriter.SetProperty(element, request.PropertyName, request.NewValue);
-                if (error is not null)
+                var result = PropertyWriter.SetProperty(element, request.PropertyName, request.NewValue);
+                if (!result.Success)
                 {
                     tcs.SetResult(new ErrorResponse
                     {
                         MessageId = request.MessageId,
-                        ErrorCode = error.Value.ErrorCode,
-                        Error = error.Value.Error,
-                        Details = error.Value.Details,
+                        ErrorCode = result.ErrorCode,
+                        Error = result.Error ?? "Error",
+                        Details = result.Details,
                     });
                     return;
                 }
 
-                // Return refreshed property list on success.
-                var properties = PropertyReader.GetProperties(element);
-                tcs.SetResult(new PropertiesResponse
-                {
+                tcs.SetResult(new AckResponse 
+                { 
                     MessageId = request.MessageId,
-                    ElementId = request.ElementId,
-                    Properties = properties,
+                    NormalizedValue = result.NormalizedValue
                 });
             }
             catch (Exception ex)
