@@ -57,14 +57,23 @@ public sealed class PropertyRowViewModel : ViewModelBase
         ErrorMessage = null;
     }
 
-    private static readonly Microsoft.UI.Xaml.Media.SolidColorBrush _errorBrush =
-        new(Windows.UI.Color.FromArgb(0xFF, 0xBF, 0x00, 0x00));
-    private static readonly Microsoft.UI.Xaml.Media.SolidColorBrush _clearBrush =
-        new(Windows.UI.Color.FromArgb(0x00, 0x00, 0x00, 0x00));
-
     /// <summary>Brush used for red border on text editors when there's an error.</summary>
-    public Microsoft.UI.Xaml.Media.SolidColorBrush ErrorBorderBrush =>
-        HasError ? _errorBrush : _clearBrush;
+    public Microsoft.UI.Xaml.Media.SolidColorBrush? ErrorBorderBrush
+    {
+        get
+        {
+            if (!HasError) return null;
+            try
+            {
+                return new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(0xFF, 0xBF, 0x00, 0x00));
+            }
+            catch
+            {
+                // DispatcherQueue not available (likely unit tests).
+                return null;
+            }
+        }
+    }
 
     /// <summary>Two-way bool bridge for CheckBox editor.</summary>
     public bool? IsCheckedValue

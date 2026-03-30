@@ -268,7 +268,7 @@ public sealed class MainViewModel : ViewModelBase
     {
         try
         {
-            var response = await _client.SendAsync<PropertiesResponse>(
+            var ack = await _client.SendAsync<AckResponse>(
                 new SetPropertyRequest
                 {
                     MessageId = Guid.NewGuid().ToString("N"),
@@ -278,26 +278,21 @@ public sealed class MainViewModel : ViewModelBase
                 });
 
             row.ClearError();
-            // Refresh the row's displayed value with what the agent confirmed.
-            var updated = response.Properties.FirstOrDefault(p => p.Name == propertyName);
-            if (updated is not null)
-                row.EditValue = updated.Value ?? string.Empty;
-        }
-        catch (SnaipeProtocolException ex) when (ex.ErrorCode == ErrorCodes.PropertyReadOnly)
-        {
-            row.SetError("Property is read-only.");
-        }
-        catch (SnaipeProtocolException ex) when (ex.ErrorCode == ErrorCodes.InvalidPropertyValue)
-        {
-            row.SetError($"Cannot parse value: {ex.Details ?? ex.Message}");
+            if (ack.NormalizedValue != null)
+                row.EditValue = ack.NormalizedValue;
         }
         catch (SnaipeProtocolException ex)
         {
-            row.SetError(ex.Message);
+            // Persistent error state
+            row.SetError(ex.Details ?? ex.Message);
         }
         catch (IOException ex)
         {
             HandleConnectionLost(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            row.SetError(ex.Message);
         }
     }
 

@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Snaipe.Inspector.Controls">
 
-    <Grid>
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -54,6 +54,7 @@
         <!-- Status bar -->
         <Border Grid.Row="2" Padding="8,4">
             <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
+                       Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"
                        FontSize="12"
                        TextTrimming="CharacterEllipsis"/>
         </Border>

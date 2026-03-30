@@ -19,8 +19,8 @@
                   Grid.Row="1"
                   SelectionMode="Single">
             <TreeView.ItemTemplate>
-                <DataTemplate x:DataType="vm:TreeNodeViewModel">
-                    <TextBlock Text="{x:Bind DisplayName}"
+                <DataTemplate>
+                    <TextBlock Text="{Binding Content.DisplayName}"
                                FontSize="12"/>
                 </DataTemplate>
             </TreeView.ItemTemplate>
