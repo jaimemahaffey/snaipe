@@ -88,7 +88,8 @@
             <StackPanel x:Name="DataContextPanel"
                         Spacing="4"
                         Padding="8"
-                        BorderThickness="1">
+                        BorderThickness="1"
+                        BorderBrush="{ThemeResource SystemControlForegroundBaseMediumBrush}">
                 <TextBlock x:Name="DataContextLabel"
                            Text="DataContext inherited below:"
                            Opacity="0.7"/>
