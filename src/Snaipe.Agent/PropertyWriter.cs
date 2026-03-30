@@ -8,6 +8,11 @@ using Microsoft.UI.Xaml.Media;
 namespace Snaipe.Agent;
 
 /// <summary>
+/// Result of a property set operation.
+/// </summary>
+public record struct SetPropertyResult(bool Success, int ErrorCode = 0, string? Error = null, string? Details = null, string? NormalizedValue = null);
+
+/// <summary>
 /// Writes dependency property values on a UIElement by parsing string values.
 /// Must be called on the UI thread.
 /// </summary>
@@ -17,15 +22,15 @@ public static class PropertyWriter
     /// Set a dependency property on an element by name, parsing the string value
     /// into the appropriate CLR type.
     /// </summary>
-    /// <returns>null on success, or an error message on failure.</returns>
-    public static (int ErrorCode, string Error, string? Details)? SetProperty(
+    /// <returns>A SetPropertyResult indicating success or failure.</returns>
+    public static SetPropertyResult SetProperty(
         DependencyObject element, string propertyName, string newValue)
     {
         // Find the DependencyProperty by name.
         var dpField = FindDependencyPropertyField(element.GetType(), propertyName);
         if (dpField is null)
         {
-            return (Protocol.ErrorCodes.PropertyNotFound,
+            return new SetPropertyResult(false, Protocol.ErrorCodes.PropertyNotFound,
                 "Property not found",
                 $"No DependencyProperty '{propertyName}' on {element.GetType().Name}");
         }
@@ -38,7 +43,7 @@ public static class PropertyWriter
 
         if (clrProperty is not null && !clrProperty.CanWrite)
         {
-            return (Protocol.ErrorCodes.PropertyReadOnly,
+            return new SetPropertyResult(false, Protocol.ErrorCodes.PropertyReadOnly,
                 "Property is read-only",
                 $"'{propertyName}' does not have a setter.");
         }
@@ -52,14 +57,14 @@ public static class PropertyWriter
         }
         catch (Exception ex)
         {
-            return (Protocol.ErrorCodes.InvalidPropertyValue,
+            return new SetPropertyResult(false, Protocol.ErrorCodes.InvalidPropertyValue,
                 "Invalid property value",
                 $"Cannot parse '{newValue}' as {targetType.Name}: {ex.Message}");
         }
 
         // Set the value.
         element.SetValue(dp, parsedValue);
-        return null; // Success.
+        return new SetPropertyResult(true, NormalizedValue: parsedValue?.ToString() ?? newValue);
     }
 
     private static FieldInfo? FindDependencyPropertyField(Type type, string propertyName)
