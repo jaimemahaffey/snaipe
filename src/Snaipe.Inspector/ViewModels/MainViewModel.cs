@@ -161,9 +161,59 @@ public sealed class MainViewModel : ViewModelBase
         ConnectCommand.RaiseCanExecuteChanged();
     }
 
-    private Task ConnectAsync() => Task.CompletedTask;   // wired in Task 5
-    private void Disconnect() { }                         // wired in Task 5
-    private Task FetchTreeAsync() => Task.CompletedTask; // wired in Task 5
+    private async Task ConnectAsync()
+    {
+        if (_selectedAgent is null) return;
+        _state = ConnectionState.Connecting;
+        StatusMessage = $"Connecting to {_selectedAgent.DisplayName}...";
+        RefreshCommandStates();
+
+        try
+        {
+            await _client.ConnectAsync(_selectedAgent.PipeName);
+            _state = ConnectionState.Connected;
+            StatusMessage = $"Connected to {_selectedAgent.DisplayName}";
+            RefreshCommandStates();
+            await FetchTreeAsync();
+        }
+        catch (Exception ex)
+        {
+            _state = ConnectionState.Disconnected;
+            StatusMessage = $"Connection failed: {ex.Message}";
+            RefreshCommandStates();
+        }
+    }
+    private void Disconnect()
+    {
+        _client.Disconnect();
+        _state = ConnectionState.Disconnected;
+        StatusMessage = "Disconnected.";
+        ClearSession();
+        RefreshCommandStates();
+    }
+    private async Task FetchTreeAsync()
+    {
+        try
+        {
+            StatusMessage = "Fetching tree...";
+            var expandedIds = CollectExpandedIds(RootNodes);
+
+            var response = await _client.SendAsync<TreeResponse>(
+                new GetTreeRequest { MessageId = Guid.NewGuid().ToString("N") });
+
+            RootNodes.Clear();
+            RootNodes.Add(BuildTreeNode(response.Root, expandedIds));
+            StatusMessage = $"Tree loaded ({CountNodes(response.Root)} elements).";
+        }
+        catch (IOException ex)
+        {
+            HandleConnectionLost(ex.Message);
+        }
+        catch (SnaipeProtocolException ex)
+        {
+            StatusMessage = $"Tree error: {ex.Message}";
+        }
+    }
     private Task OnSelectedNodeChangedAsync(TreeNodeViewModel? node) => Task.CompletedTask; // wired in Task 6
     public Task SetPropertyAsync(string elementId, string propertyName, string newValue,
         PropertyRowViewModel row) => Task.CompletedTask; // wired in Task 6
