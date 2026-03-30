@@ -56,4 +56,33 @@ public sealed class PropertyRowViewModel : ViewModelBase
         HasError = false;
         ErrorMessage = null;
     }
+
+    /// <summary>Brush used for red border on text editors when there's an error.</summary>
+    public Microsoft.UI.Xaml.Media.SolidColorBrush ErrorBorderBrush =>
+        HasError
+            ? new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(0xFF, 0xBF, 0x00, 0x00))
+            : new Microsoft.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(0x00, 0x00, 0x00, 0x00));
+
+    /// <summary>Two-way bool bridge for CheckBox editor.</summary>
+    public bool? IsCheckedValue
+    {
+        get => bool.TryParse(EditValue, out var b) ? b : null;
+        set
+        {
+            EditValue = value?.ToString() ?? "False";
+            CommitEditCommand.Execute(null);
+        }
+    }
+
+    /// <summary>Two-way double bridge for NumberBox editor.</summary>
+    public double NumberValue
+    {
+        get => double.TryParse(EditValue, System.Globalization.NumberStyles.Any,
+                   System.Globalization.CultureInfo.InvariantCulture, out var d) ? d : 0;
+        set
+        {
+            EditValue = value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            CommitEditCommand.Execute(null);
+        }
+    }
 }

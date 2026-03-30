@@ -1,6 +1,111 @@
 <UserControl
     x:Class="Snaipe.Inspector.Controls.PropertyGridControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid/>
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Snaipe.Inspector.Controls"
+    xmlns:vm="using:Snaipe.Inspector.ViewModels">
+
+    <UserControl.Resources>
+
+        <local:PropertyEditorTemplateSelector x:Key="EditorSelector">
+            <local:PropertyEditorTemplateSelector.ReadOnlyTemplate>
+                <DataTemplate x:DataType="vm:PropertyRowViewModel">
+                    <TextBlock Text="{x:Bind Entry.Value}"
+                               FontSize="12"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center"/>
+                </DataTemplate>
+            </local:PropertyEditorTemplateSelector.ReadOnlyTemplate>
+
+            <local:PropertyEditorTemplateSelector.TextTemplate>
+                <DataTemplate x:DataType="vm:PropertyRowViewModel">
+                    <TextBox Text="{x:Bind EditValue, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             FontSize="12"
+                             BorderBrush="{x:Bind ErrorBorderBrush, Mode=OneWay}"
+                             BorderThickness="1"
+                             ToolTipService.ToolTip="{Binding ErrorMessage}"/>
+                </DataTemplate>
+            </local:PropertyEditorTemplateSelector.TextTemplate>
+
+            <local:PropertyEditorTemplateSelector.BooleanTemplate>
+                <DataTemplate x:DataType="vm:PropertyRowViewModel">
+                    <CheckBox IsChecked="{x:Bind IsCheckedValue, Mode=TwoWay}"
+                              VerticalAlignment="Center"/>
+                </DataTemplate>
+            </local:PropertyEditorTemplateSelector.BooleanTemplate>
+
+            <local:PropertyEditorTemplateSelector.NumberTemplate>
+                <DataTemplate x:DataType="vm:PropertyRowViewModel">
+                    <NumberBox Value="{Binding NumberValue, Mode=TwoWay}"
+                               SpinButtonPlacementMode="Compact"
+                               FontSize="12"/>
+                </DataTemplate>
+            </local:PropertyEditorTemplateSelector.NumberTemplate>
+
+            <local:PropertyEditorTemplateSelector.EnumTemplate>
+                <DataTemplate x:DataType="vm:PropertyRowViewModel">
+                    <TextBox Text="{x:Bind EditValue, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             FontSize="12"/>
+                </DataTemplate>
+            </local:PropertyEditorTemplateSelector.EnumTemplate>
+        </local:PropertyEditorTemplateSelector>
+
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{x:Bind ViewModel.PropertyGroups, Mode=OneWay}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:PropertyGroupViewModel">
+                    <StackPanel>
+                        <Border BorderThickness="0,1,0,0" Padding="4,6,4,2" Margin="0,8,0,0">
+                            <TextBlock Text="{x:Bind Category}"
+                                       FontWeight="Bold"
+                                       FontSize="13"/>
+                        </Border>
+
+                        <ItemsControl ItemsSource="{x:Bind Properties}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:PropertyRowViewModel">
+                                    <Grid Padding="4,2" ColumnSpacing="4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="1.5*"/>
+                                            <ColumnDefinition Width="0.7*"/>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{x:Bind Entry.Name}"
+                                                   FontSize="12"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   ToolTipService.ToolTip="{x:Bind Entry.Name}"/>
+
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{x:Bind Entry.ValueType}"
+                                                   FontSize="10"
+                                                   Opacity="0.6"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"/>
+
+                                        <ContentPresenter Grid.Column="2"
+                                                          Content="{x:Bind}"
+                                                          ContentTemplateSelector="{StaticResource EditorSelector}"/>
+
+                                        <TextBlock Grid.Column="3"
+                                                   Text="{x:Bind Entry.BindingExpression}"
+                                                   FontSize="10"
+                                                   Opacity="0.5"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   ToolTipService.ToolTip="{x:Bind Entry.BindingExpression}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
 </UserControl>
