@@ -60,8 +60,10 @@
                     <StackPanel>
                         <Border BorderThickness="0,1,0,0" Padding="4,6,4,2" Margin="0,8,0,0">
                             <TextBlock Text="{x:Bind Category}"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"
                                        FontWeight="Bold"
                                        FontSize="13"/>
+
                         </Border>
 
                         <ItemsControl ItemsSource="{x:Bind Properties}">
@@ -77,6 +79,7 @@
 
                                         <TextBlock Grid.Column="0"
                                                    Text="{x:Bind Entry.Name}"
+                                                   Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"
                                                    FontSize="12"
                                                    VerticalAlignment="Center"
                                                    TextTrimming="CharacterEllipsis"

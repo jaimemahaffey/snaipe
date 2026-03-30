@@ -7,6 +7,7 @@
         <StackPanel Spacing="4">
 
             <TextBlock Text="Element Preview"
+                       Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"
                        FontWeight="Bold"
                        FontSize="13"
                        Margin="0,0,0,4"/>
@@ -26,26 +27,26 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Type:"    FontSize="12" Opacity="0.7"/>
-                <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Bind SelectedTypeName, Mode=OneWay}"  FontSize="12"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Type:"    Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" FontSize="12" Opacity="0.7"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Bind SelectedTypeName, Mode=OneWay}" Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" FontSize="12"/>
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Name:"    FontSize="12" Opacity="0.7"/>
-                <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind SelectedName, Mode=OneWay}"     FontSize="12"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Name:"    Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" FontSize="12" Opacity="0.7"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind SelectedName, Mode=OneWay}"     Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" FontSize="12"/>
 
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="ID:"      FontSize="12" Opacity="0.7"/>
-                <TextBlock Grid.Row="2" Grid.Column="1" Text="{x:Bind SelectedId, Mode=OneWay}"       FontSize="11" FontFamily="Consolas"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="ID:"      Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" FontSize="12" Opacity="0.7"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{x:Bind SelectedId, Mode=OneWay}"       Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" FontSize="11" FontFamily="Consolas"/>
 
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="X:"       FontSize="12" Opacity="0.7"/>
-                <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Bind SelectedBoundsX, Mode=OneWay}"  FontSize="12"/>
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="X:"       Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" FontSize="12" Opacity="0.7"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Bind SelectedBoundsX, Mode=OneWay}"  Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" FontSize="12"/>
 
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="Y:"       FontSize="12" Opacity="0.7"/>
-                <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Bind SelectedBoundsY, Mode=OneWay}"  FontSize="12"/>
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Y:"       Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" FontSize="12" Opacity="0.7"/>
+                <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Bind SelectedBoundsY, Mode=OneWay}"  Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" FontSize="12"/>
 
-                <TextBlock Grid.Row="5" Grid.Column="0" Text="Width:"   FontSize="12" Opacity="0.7"/>
-                <TextBlock Grid.Row="5" Grid.Column="1" Text="{x:Bind SelectedBoundsW, Mode=OneWay}"  FontSize="12"/>
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Width:"   Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" FontSize="12" Opacity="0.7"/>
+                <TextBlock Grid.Row="5" Grid.Column="1" Text="{x:Bind SelectedBoundsW, Mode=OneWay}"  Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" FontSize="12"/>
 
-                <TextBlock Grid.Row="6" Grid.Column="0" Text="Height:"  FontSize="12" Opacity="0.7"/>
-                <TextBlock Grid.Row="6" Grid.Column="1" Text="{x:Bind SelectedBoundsH, Mode=OneWay}"  FontSize="12"/>
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="Height:"  Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" FontSize="12" Opacity="0.7"/>
+                <TextBlock Grid.Row="6" Grid.Column="1" Text="{x:Bind SelectedBoundsH, Mode=OneWay}"  Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" FontSize="12"/>
             </Grid>
 
             <TextBlock Text="Visual preview coming in a future release."
