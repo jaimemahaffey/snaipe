@@ -135,7 +135,7 @@ public static class PropertyReader
         };
     }
 
-    private static string GetValueKind(Type type)
+    internal static string GetValueKind(Type type)
     {
         // Unwrap Nullable<T> so e.g. bool? reports as "Boolean" rather than "Object".
         var underlying = Nullable.GetUnderlyingType(type);
@@ -151,7 +151,7 @@ public static class PropertyReader
         return "Object";
     }
 
-    private static string FormatValue(object? value)
+    internal static string FormatValue(object? value)
     {
         return value switch
         {

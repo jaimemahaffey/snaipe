@@ -82,7 +82,7 @@ public static class PropertyWriter
         return null;
     }
 
-    private static object? ParseValue(string value, Type targetType)
+    internal static object? ParseValue(string value, Type targetType)
     {
         if (targetType == typeof(string))
             return value;
