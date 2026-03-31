@@ -15,6 +15,7 @@ public sealed class MainViewModel : ViewModelBase
     private string _statusMessage = "Ready";
     private bool _isLoadingProperties;
     private string _connectButtonLabel = "Connect";
+    private CancellationTokenSource? _propertiesCts;
 
     public MainViewModel()
     {
@@ -39,6 +40,7 @@ public sealed class MainViewModel : ViewModelBase
     public ObservableCollection<AgentInfo> DiscoveredAgents { get; } = [];
     public ObservableCollection<TreeNodeViewModel> RootNodes { get; } = [];
     public ObservableCollection<PropertyGroupViewModel> PropertyGroups { get; } = [];
+    public PropertyGridViewModel PropertyGrid { get; } = new();
 
     // ── State properties ──────────────────────────────────────────────────────
     public bool IsConnected => _state == ConnectionState.Connected;
@@ -96,7 +98,7 @@ public sealed class MainViewModel : ViewModelBase
     private void ClearSession()
     {
         RootNodes.Clear();
-        PropertyGroups.Clear();
+        PropertyGrid.Clear();
         _selectedNode = null;
         OnPropertyChanged(nameof(SelectedNode));
     }
@@ -141,13 +143,6 @@ public sealed class MainViewModel : ViewModelBase
             count += CountNodes(child);
         return count;
     }
-
-    private static int CategoryOrder(string category) => category switch
-    {
-        "Common" => 0, "Layout" => 1, "Appearance" => 2,
-        "Data Context" => 3, "Visual States" => 4,
-        "Style" => 5, "Template" => 6, _ => 7,
-    };
 
     // ── Command implementations (IPC calls added in Tasks 5 & 6) ─────────────
     private void RefreshAgents()
@@ -220,7 +215,11 @@ public sealed class MainViewModel : ViewModelBase
     }
     private async Task OnSelectedNodeChangedAsync(TreeNodeViewModel? node)
     {
-        PropertyGroups.Clear();
+        _propertiesCts?.Cancel();
+        _propertiesCts = new CancellationTokenSource();
+        var ct = _propertiesCts.Token;
+
+        PropertyGrid.Clear();
         if (node is null || _state != ConnectionState.Connected) return;
 
         IsLoadingProperties = true;
@@ -233,21 +232,20 @@ public sealed class MainViewModel : ViewModelBase
                     ElementId = node.Node.Id,
                 });
 
-            var orderedGroups = response.Properties
-                .GroupBy(p => p.Category)
-                .OrderBy(g => CategoryOrder(g.Key));
+            if (ct.IsCancellationRequested) return;
 
-            foreach (var group in orderedGroups)
-            {
-                var groupVm = new PropertyGroupViewModel(group.Key);
-                foreach (var prop in group.OrderBy(p => p.Name))
-                    groupVm.Properties.Add(new PropertyRowViewModel(prop,
-                        row => SetPropertyAsync(node.Node.Id, row.Entry.Name, row.EditValue, row)));
-                PropertyGroups.Add(groupVm);
-            }
+            var rows = response.Properties
+                .Select(prop => new PropertyRowViewModel(prop,
+                    row => SetPropertyAsync(node.Node.Id, row.Entry.Name, row.EditValue, row)))
+                .ToList();
 
-            // Fire-and-forget highlight — best effort, never crashes the Inspector.
+            PropertyGrid.Load(rows);
+
             _ = SendHighlightAsync(node.Node.Id, show: true);
+        }
+        catch (OperationCanceledException)
+        {
+            // Superseded by a newer selection — do nothing.
         }
         catch (IOException ex)
         {
