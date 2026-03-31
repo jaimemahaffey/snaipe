@@ -20,10 +20,10 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public void InitialState_PropertyGroupsIsEmpty()
+    public void InitialState_PropertyGridIsEmpty()
     {
         var vm = new MainViewModel();
-        Assert.Empty(vm.PropertyGroups);
+        Assert.Empty(vm.PropertyGrid.FilteredProperties);
     }
 
     [Fact]

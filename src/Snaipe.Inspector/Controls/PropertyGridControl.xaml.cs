@@ -10,10 +10,15 @@ public sealed partial class PropertyGridControl : UserControl
     {
         InitializeComponent();
         DataContextChanged += (_, _) => Bindings.Update();
+        SearchBox.TextChanged += OnSearchTextChanged;
     }
 
-    // Safe as-cast: x:Bind evaluates before DataContext is set during XAML init;
-    // hard cast would throw at startup. DataContextChanged + Bindings.Update() handles
-    // the refresh once DataContext is properly assigned.
-    public MainViewModel? ViewModel => DataContext as MainViewModel;
+    // DataContext is PropertyGridViewModel (set from MainWindow via x:Bind ViewModel.PropertyGrid).
+    public PropertyGridViewModel? ViewModel => DataContext as PropertyGridViewModel;
+
+    private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (ViewModel is { } vm)
+            vm.SearchText = SearchBox.Text;
+    }
 }

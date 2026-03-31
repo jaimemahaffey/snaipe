@@ -51,65 +51,133 @@
             </local:PropertyEditorTemplateSelector.EnumTemplate>
         </local:PropertyEditorTemplateSelector>
 
+        <Style x:Key="ColumnHeaderButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="4,4"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
     </UserControl.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <ItemsControl ItemsSource="{x:Bind ViewModel.PropertyGroups, Mode=OneWay}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="vm:PropertyGroupViewModel">
-                    <StackPanel>
-                        <Border BorderThickness="0,1,0,0" Padding="4,6,4,2" Margin="0,8,0,0">
-                            <TextBlock Text="{x:Bind Category}"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"
-                                       FontWeight="Bold"
-                                       FontSize="13"/>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                        </Border>
+        <!-- Search bar -->
+        <TextBox x:Name="SearchBox"
+                 Grid.Row="0"
+                 PlaceholderText="Search properties..."
+                 FontSize="12"
+                 Margin="4,4,4,2"/>
 
-                        <ItemsControl ItemsSource="{x:Bind Properties}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:PropertyRowViewModel">
-                                    <Grid Padding="4,2" ColumnSpacing="4">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="1.5*"/>
-                                            <ColumnDefinition Width="0.7*"/>
-                                            <ColumnDefinition Width="2*"/>
-                                            <ColumnDefinition Width="1*"/>
-                                        </Grid.ColumnDefinitions>
+        <!-- Column headers -->
+        <Grid Grid.Row="1"
+              Padding="4,2"
+              ColumnSpacing="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1.5*"/>
+                <ColumnDefinition Width="50"/>
+            </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Column="0"
-                                                   Text="{x:Bind Entry.Name}"
-                                                   Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"
-                                                   FontSize="12"
-                                                   VerticalAlignment="Center"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   ToolTipService.ToolTip="{x:Bind Entry.Name}"/>
+            <Button Grid.Column="0"
+                    Content="{x:Bind ViewModel.NameColumnHeader, Mode=OneWay}"
+                    Command="{Binding SortByCommand}"
+                    CommandParameter="Name"
+                    Style="{StaticResource ColumnHeaderButtonStyle}"/>
 
-                                        <TextBlock Grid.Column="1"
-                                                   Text="{x:Bind Entry.ValueType}"
-                                                   FontSize="10"
-                                                   Opacity="0.6"
-                                                   VerticalAlignment="Center"
-                                                   TextTrimming="CharacterEllipsis"/>
+            <TextBlock Grid.Column="1"
+                       Text="VALUE"
+                       FontSize="11"
+                       FontWeight="SemiBold"
+                       Padding="4"
+                       VerticalAlignment="Center"/>
 
-                                        <ContentPresenter Grid.Column="2"
-                                                          Content="{x:Bind}"
-                                                          ContentTemplateSelector="{StaticResource EditorSelector}"/>
+            <Button Grid.Column="2"
+                    Content="{x:Bind ViewModel.TypeColumnHeader, Mode=OneWay}"
+                    Command="{Binding SortByCommand}"
+                    CommandParameter="Type"
+                    Style="{StaticResource ColumnHeaderButtonStyle}"/>
 
-                                        <TextBlock Grid.Column="3"
-                                                   Text="{x:Bind Entry.BindingExpression}"
-                                                   FontSize="10"
-                                                   Opacity="0.5"
-                                                   VerticalAlignment="Center"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   ToolTipService.ToolTip="{x:Bind Entry.BindingExpression}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
+            <Button Grid.Column="3"
+                    Content="{x:Bind ViewModel.CategoryColumnHeader, Mode=OneWay}"
+                    Command="{Binding SortByCommand}"
+                    CommandParameter="Category"
+                    Style="{StaticResource ColumnHeaderButtonStyle}"/>
+
+            <Button Grid.Column="4"
+                    Content="{x:Bind ViewModel.ReadOnlyColumnHeader, Mode=OneWay}"
+                    Command="{Binding SortByCommand}"
+                    CommandParameter="ReadOnly"
+                    Style="{StaticResource ColumnHeaderButtonStyle}"/>
+        </Grid>
+
+        <!-- Property rows -->
+        <ListView Grid.Row="2"
+                  ItemsSource="{x:Bind ViewModel.FilteredProperties, Mode=OneWay}"
+                  SelectionMode="None">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="MinHeight" Value="0"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="vm:PropertyRowViewModel">
+                    <Grid Padding="4,2"
+                          ColumnSpacing="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1.5*"/>
+                            <ColumnDefinition Width="50"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0"
+                                   Text="{x:Bind Entry.Name}"
+                                   FontSize="12"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"
+                                   ToolTipService.ToolTip="{x:Bind Entry.Name}"/>
+
+                        <ContentPresenter Grid.Column="1"
+                                          Content="{x:Bind}"
+                                          ContentTemplateSelector="{StaticResource EditorSelector}"/>
+
+                        <TextBlock Grid.Column="2"
+                                   Text="{x:Bind Entry.ValueType}"
+                                   FontSize="10"
+                                   Opacity="0.6"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"/>
+
+                        <TextBlock Grid.Column="3"
+                                   Text="{x:Bind Entry.Category}"
+                                   FontSize="10"
+                                   Opacity="0.6"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"/>
+
+                        <CheckBox Grid.Column="4"
+                                  IsChecked="{x:Bind Entry.IsReadOnly}"
+                                  IsEnabled="False"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                    </Grid>
                 </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </ScrollViewer>
+            </ListView.ItemTemplate>
+        </ListView>
+
+    </Grid>
 </UserControl>
