@@ -276,7 +276,7 @@ git commit -m "feat: add PropertyGridViewModel with Load/Clear"
 - Modify: `tests/Snaipe.Inspector.Tests/PropertyGridViewModelTests.cs` — add search tests
 - No production code changes needed — `SearchText` and filtering are already implemented
 
-- [ ] **Step 1: Add search tests**
+- [x] **Step 1: Add search tests**
 
 Append to the `PropertyGridViewModelTests` class body:
 
@@ -320,7 +320,7 @@ Append to the `PropertyGridViewModelTests` class body:
     }
 ```
 
-- [ ] **Step 2: Run tests — expect pass**
+- [x] **Step 2: Run tests — expect pass**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~PropertyGridViewModelTests"
@@ -328,7 +328,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: `8 passed, 0 failed`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add tests/Snaipe.Inspector.Tests/PropertyGridViewModelTests.cs
@@ -342,7 +342,7 @@ git commit -m "test: verify PropertyGridViewModel search filtering"
 **Files:**
 - Modify: `tests/Snaipe.Inspector.Tests/PropertyGridViewModelTests.cs` — add sort tests
 
-- [ ] **Step 1: Add sort tests**
+- [x] **Step 1: Add sort tests**
 
 Append to the `PropertyGridViewModelTests` class body:
 
@@ -427,7 +427,7 @@ Append to the `PropertyGridViewModelTests` class body:
     }
 ```
 
-- [ ] **Step 2: Run tests — expect pass**
+- [x] **Step 2: Run tests — expect pass**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~PropertyGridViewModelTests"
@@ -435,7 +435,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: `15 passed, 0 failed`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add tests/Snaipe.Inspector.Tests/PropertyGridViewModelTests.cs
@@ -451,7 +451,7 @@ git commit -m "test: verify PropertyGridViewModel sort and indicators"
 
 Replace the `PropertyGroups` machinery with `PropertyGridViewModel`. Make these changes:
 
-- [ ] **Step 1: Add `PropertyGrid` property and `_propertiesCts` field**
+- [x] **Step 1: Add `PropertyGrid` property and `_propertiesCts` field**
 
 In the fields section (around line 16), add:
 ```csharp
@@ -467,7 +467,7 @@ With:
 public PropertyGridViewModel PropertyGrid { get; } = new();
 ```
 
-- [ ] **Step 2: Update `ClearSession` (around line 96–102)**
+- [x] **Step 2: Update `ClearSession` (around line 96–102)**
 
 Replace:
 ```csharp
@@ -478,7 +478,7 @@ With:
 PropertyGrid.Clear();
 ```
 
-- [ ] **Step 3: Replace `OnSelectedNodeChangedAsync` body**
+- [x] **Step 3: Replace `OnSelectedNodeChangedAsync` body**
 
 The method currently runs from approximately line 221 to 264. Replace the entire method with:
 
@@ -532,13 +532,13 @@ private async Task OnSelectedNodeChangedAsync(TreeNodeViewModel? node)
 }
 ```
 
-- [ ] **Step 4: Remove `CategoryOrder` method**
+- [x] **Step 4: Remove `CategoryOrder` method**
 
 Delete the `CategoryOrder` private static method (around line 145–150) — it has moved to `PropertyGridViewModel`.
 
 > **Note:** Do NOT remove the `PropertyGroups` property declaration yet. The existing `PropertyGridControl.xaml` still references `ViewModel.PropertyGroups` via `x:Bind` (compile-time checked). Leave the empty property in place — it will be removed in Task 8 after the XAML is replaced.
 
-- [ ] **Step 5: Build to verify**
+- [x] **Step 5: Build to verify**
 
 ```bash
 dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v quiet
@@ -546,7 +546,7 @@ dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v q
 
 Expected: `Build succeeded.`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/Snaipe.Inspector/ViewModels/MainViewModel.cs
@@ -560,7 +560,7 @@ git commit -m "refactor: wire PropertyGridViewModel into MainViewModel, add CTS 
 **Files:**
 - Modify: `tests/Snaipe.Inspector.Tests/MainViewModelTests.cs`
 
-- [ ] **Step 1: Replace the `PropertyGroups` test**
+- [x] **Step 1: Replace the `PropertyGroups` test**
 
 The test `InitialState_PropertyGroupsIsEmpty` references the removed `PropertyGroups` property. Replace it:
 
@@ -573,7 +573,7 @@ public void InitialState_PropertyGridIsEmpty()
 }
 ```
 
-- [ ] **Step 2: Run all tests**
+- [x] **Step 2: Run all tests**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows
@@ -581,7 +581,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: all tests pass.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add tests/Snaipe.Inspector.Tests/MainViewModelTests.cs
@@ -596,7 +596,7 @@ git commit -m "test: update MainViewModelTests to use PropertyGrid instead of Pr
 - Replace: `src/Snaipe.Inspector/Controls/PropertyGridControl.xaml`
 - Modify: `src/Snaipe.Inspector/Controls/PropertyGridControl.xaml.cs`
 
-- [ ] **Step 1: Replace `PropertyGridControl.xaml` entirely**
+- [x] **Step 1: Replace `PropertyGridControl.xaml` entirely**
 
 ```xml
 <UserControl
@@ -784,7 +784,7 @@ git commit -m "test: update MainViewModelTests to use PropertyGrid instead of Pr
 </UserControl>
 ```
 
-- [ ] **Step 2: Update `PropertyGridControl.xaml.cs`**
+- [x] **Step 2: Update `PropertyGridControl.xaml.cs`**
 
 Replace the entire file:
 
@@ -815,7 +815,7 @@ public sealed partial class PropertyGridControl : UserControl
 }
 ```
 
-- [ ] **Step 3: Build to verify**
+- [x] **Step 3: Build to verify**
 
 ```bash
 dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v quiet
@@ -823,7 +823,7 @@ dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v q
 
 Expected: `Build succeeded.`
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/Snaipe.Inspector/Controls/PropertyGridControl.xaml src/Snaipe.Inspector/Controls/PropertyGridControl.xaml.cs
@@ -839,7 +839,7 @@ git commit -m "feat: replace PropertyGridControl with searchable sortable DataGr
 - Modify: `src/Snaipe.Inspector/ViewModels/MainViewModel.cs` — remove `PropertyGroups` property (safe now that XAML no longer references it)
 - Delete: `src/Snaipe.Inspector/ViewModels/PropertyGroupViewModel.cs`
 
-- [ ] **Step 1: Update `MainWindow.xaml`**
+- [x] **Step 1: Update `MainWindow.xaml`**
 
 Find the line:
 ```xml
@@ -852,7 +852,7 @@ Replace with:
                                DataContext="{x:Bind ViewModel.PropertyGrid}"/>
 ```
 
-- [ ] **Step 2: Remove `PropertyGroups` from `MainViewModel`**
+- [x] **Step 2: Remove `PropertyGroups` from `MainViewModel`**
 
 In `src/Snaipe.Inspector/ViewModels/MainViewModel.cs`, delete this line (the XAML no longer references it):
 
@@ -862,13 +862,13 @@ public ObservableCollection<PropertyGroupViewModel> PropertyGroups { get; } = []
 
 Also remove the `using` or any remaining reference to `PropertyGroupViewModel` if the compiler flags it.
 
-- [ ] **Step 3: Delete `PropertyGroupViewModel.cs`**
+- [x] **Step 3: Delete `PropertyGroupViewModel.cs`**
 
 ```bash
 rm src/Snaipe.Inspector/ViewModels/PropertyGroupViewModel.cs
 ```
 
-- [ ] **Step 4: Build and run all tests**
+- [x] **Step 4: Build and run all tests**
 
 ```bash
 dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v quiet
@@ -877,7 +877,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: build succeeded, all tests pass.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/Snaipe.Inspector/MainWindow.xaml
