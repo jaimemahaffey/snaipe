@@ -31,7 +31,7 @@
 **Files:**
 - Modify: `src/Snaipe.Inspector/ViewModels/RelayCommand.cs`
 
-- [ ] **Step 1: Append `RelayCommand<T>` to the existing file**
+- [x] **Step 1: Append `RelayCommand<T>` to the existing file**
 
 Open `src/Snaipe.Inspector/ViewModels/RelayCommand.cs` (currently 20 lines) and append after the closing `}` of `RelayCommand`:
 
@@ -54,7 +54,7 @@ public sealed class RelayCommand<T> : ICommand
 }
 ```
 
-- [ ] **Step 2: Build to verify no errors**
+- [x] **Step 2: Build to verify no errors**
 
 ```bash
 dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v quiet
@@ -62,7 +62,7 @@ dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v q
 
 Expected: `Build succeeded. 0 Warning(s). 0 Error(s).`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/Snaipe.Inspector/ViewModels/RelayCommand.cs
