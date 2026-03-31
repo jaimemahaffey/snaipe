@@ -39,7 +39,6 @@ public sealed class MainViewModel : ViewModelBase
     // ── Collections ──────────────────────────────────────────────────────────
     public ObservableCollection<AgentInfo> DiscoveredAgents { get; } = [];
     public ObservableCollection<TreeNodeViewModel> RootNodes { get; } = [];
-    public ObservableCollection<PropertyGroupViewModel> PropertyGroups { get; } = [];
     public PropertyGridViewModel PropertyGrid { get; } = new();
 
     // ── State properties ──────────────────────────────────────────────────────
