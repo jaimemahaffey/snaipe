@@ -77,7 +77,7 @@ git commit -m "feat: add RelayCommand<T> generic command helper"
 - Create: `src/Snaipe.Inspector/ViewModels/PropertyGridViewModel.cs`
 - Create: `tests/Snaipe.Inspector.Tests/PropertyGridViewModelTests.cs`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `tests/Snaipe.Inspector.Tests/PropertyGridViewModelTests.cs`:
 
@@ -129,7 +129,7 @@ public class PropertyGridViewModelTests
 }
 ```
 
-- [ ] **Step 2: Run tests — expect compile failure**
+- [x] **Step 2: Run tests — expect compile failure**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~PropertyGridViewModelTests"
@@ -137,7 +137,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: build error — `PropertyGridViewModel` does not exist.
 
-- [ ] **Step 3: Create `PropertyGridViewModel` with Load and Clear**
+- [x] **Step 3: Create `PropertyGridViewModel` with Load and Clear**
 
 Create `src/Snaipe.Inspector/ViewModels/PropertyGridViewModel.cs`:
 
@@ -253,7 +253,7 @@ public sealed class PropertyGridViewModel : ViewModelBase
 }
 ```
 
-- [ ] **Step 4: Run tests — expect pass**
+- [x] **Step 4: Run tests — expect pass**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~PropertyGridViewModelTests"
@@ -261,7 +261,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: `4 passed, 0 failed`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/Snaipe.Inspector/ViewModels/PropertyGridViewModel.cs tests/Snaipe.Inspector.Tests/PropertyGridViewModelTests.cs
