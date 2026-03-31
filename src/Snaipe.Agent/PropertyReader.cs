@@ -44,14 +44,16 @@ public static class PropertyReader
                 // Unwrap Nullable<T> for enum name resolution (matches GetValueKind behaviour).
                 var effectiveType = Nullable.GetUnderlyingType(valueType) ?? valueType;
 
+                var kind = GetValueKind(valueType);
                 entries.Add(new Protocol.PropertyEntry
                 {
                     Name = dpInfo.Name,
                     Category = CategorizeProperty(dpInfo.Name),
                     ValueType = valueType.Name,
                     Value = FormatValue(value),
-                    ValueKind = GetValueKind(valueType),
+                    ValueKind = kind,
                     IsReadOnly = isReadOnly,
+                    IsObjectValued = kind == "Object" && value is not null,
                     BindingExpression = bindingExpression,
                     EnumValues = effectiveType.IsEnum ? Enum.GetNames(effectiveType).ToList() : null,
                 });
@@ -313,6 +315,16 @@ public static class PropertyReader
                     Value = dcValue.ToString() ?? "(null)",
                     ValueKind = "String",
                     IsReadOnly = true,
+                });
+                results.Add(new Protocol.PropertyEntry
+                {
+                    Name = "DataContext",
+                    Category = "Data Context",
+                    ValueType = dcValue.GetType().Name,
+                    Value = dcValue.GetType().Name,
+                    ValueKind = "Object",
+                    IsReadOnly = true,
+                    IsObjectValued = true,
                 });
             }
 
