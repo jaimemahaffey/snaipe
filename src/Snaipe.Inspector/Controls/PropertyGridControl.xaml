@@ -103,8 +103,7 @@
                     <DataTemplate x:DataType="vm:BreadcrumbSegment">
                         <StackPanel Orientation="Horizontal">
                             <Button Content="{x:Bind Label}"
-                                    Command="{Binding ElementName=Root, Path=Host.NavigateToBreadcrumbCommand}"
-                                    CommandParameter="{x:Bind}"
+                                    Command="{x:Bind NavigateCommand}"
                                     Style="{StaticResource BreadcrumbButtonStyle}"/>
                             <TextBlock Text=" › "
                                        FontSize="11"
@@ -200,8 +199,7 @@
                                        ToolTipService.ToolTip="{x:Bind Entry.Name}"/>
                             <Button Content="›"
                                     Visibility="{x:Bind DrillVisibility}"
-                                    Command="{Binding ElementName=Root, Path=Host.DrillIntoCommand}"
-                                    CommandParameter="{x:Bind}"
+                                    Command="{x:Bind DrillCommand}"
                                     Style="{StaticResource ChevronButtonStyle}"/>
                         </Grid>
 

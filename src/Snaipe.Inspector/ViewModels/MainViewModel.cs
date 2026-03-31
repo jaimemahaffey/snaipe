@@ -39,7 +39,7 @@ public sealed class MainViewModel : ViewModelBase
             var newPath = Breadcrumb.Count > 0
                 ? [.. Breadcrumb.Last().Path, row.Entry.Name]
                 : new[] { row.Entry.Name };
-            Breadcrumb.Add(new BreadcrumbSegment(row.Entry.Name, newPath));
+            Breadcrumb.Add(MakeCrumb(row.Entry.Name, newPath));
             if (_selectedNode is not null)
                 _ = LoadPropertiesAsync(_selectedNode, newPath);
         });
@@ -56,6 +56,14 @@ public sealed class MainViewModel : ViewModelBase
         });
 
         RefreshAgents();
+    }
+
+    private BreadcrumbSegment MakeCrumb(string label, string[] path)
+    {
+        BreadcrumbSegment? crumb = null;
+        var navigate = new RelayCommand(() => NavigateToBreadcrumbCommand.Execute(crumb));
+        crumb = new BreadcrumbSegment(label, path, navigate);
+        return crumb;
     }
 
     // ── Collections ──────────────────────────────────────────────────────────
@@ -247,7 +255,7 @@ public sealed class MainViewModel : ViewModelBase
 
         if (node is null || _state != ConnectionState.Connected) return;
 
-        Breadcrumb.Add(new BreadcrumbSegment(node.Node.TypeName, []));
+        Breadcrumb.Add(MakeCrumb(node.Node.TypeName, []));
         await LoadPropertiesAsync(node, []);
     }
 
@@ -272,10 +280,17 @@ public sealed class MainViewModel : ViewModelBase
             if (ct.IsCancellationRequested) return;
 
             var capturedPath = path;
-            var rows = response.Properties
-                .Select(prop => new PropertyRowViewModel(prop,
-                    row => SetPropertyAsync(node.Node.Id, capturedPath, row.Entry.Name, row.EditValue, row)))
-                .ToList();
+            var rows = response.Properties.Select(prop =>
+            {
+                PropertyRowViewModel? row = null;
+                RelayCommand? drillCmd = prop.IsObjectValued
+                    ? new RelayCommand(() => DrillIntoCommand.Execute(row))
+                    : null;
+                row = new PropertyRowViewModel(prop,
+                    r => SetPropertyAsync(node.Node.Id, capturedPath, r.Entry.Name, r.EditValue, r),
+                    drillCmd);
+                return row;
+            }).ToList();
 
             PropertyGrid.Load(rows);
 
@@ -299,7 +314,7 @@ public sealed class MainViewModel : ViewModelBase
             {
                 Breadcrumb.Clear();
                 if (_selectedNode is not null)
-                    Breadcrumb.Add(new BreadcrumbSegment(_selectedNode.Node.TypeName, []));
+                    Breadcrumb.Add(MakeCrumb(_selectedNode.Node.TypeName, []));
             }
         }
         finally

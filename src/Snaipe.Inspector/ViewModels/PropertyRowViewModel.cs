@@ -13,7 +13,9 @@ public sealed class PropertyRowViewModel : ViewModelBase
     // Declared as nullable; CommitEditCommand is a no-op until wired.
     private readonly Func<PropertyRowViewModel, Task>? _commit;
 
-    public PropertyRowViewModel(PropertyEntry entry, Func<PropertyRowViewModel, Task>? commit = null)
+    public PropertyRowViewModel(PropertyEntry entry,
+        Func<PropertyRowViewModel, Task>? commit = null,
+        RelayCommand? drillCommand = null)
     {
         Entry = entry;
         _editValue = entry.Value ?? string.Empty;
@@ -21,6 +23,7 @@ public sealed class PropertyRowViewModel : ViewModelBase
         CommitEditCommand = new AsyncRelayCommand(
             () => _commit?.Invoke(this) ?? Task.CompletedTask,
             () => !Entry.IsReadOnly);
+        DrillCommand = drillCommand;
     }
 
     public PropertyEntry Entry { get; }
@@ -44,6 +47,7 @@ public sealed class PropertyRowViewModel : ViewModelBase
     }
 
     public AsyncRelayCommand CommitEditCommand { get; }
+    public RelayCommand? DrillCommand { get; }
 
     public void SetError(string message)
     {
