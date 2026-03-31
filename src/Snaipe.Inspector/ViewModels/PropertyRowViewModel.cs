@@ -75,6 +75,12 @@ public sealed class PropertyRowViewModel : ViewModelBase
         }
     }
 
+    /// <summary>Visibility for the drill-down chevron button in the Name column.</summary>
+    public Microsoft.UI.Xaml.Visibility DrillVisibility =>
+        Entry.IsObjectValued
+            ? Microsoft.UI.Xaml.Visibility.Visible
+            : Microsoft.UI.Xaml.Visibility.Collapsed;
+
     /// <summary>Two-way bool bridge for CheckBox editor.</summary>
     public bool? IsCheckedValue
     {
