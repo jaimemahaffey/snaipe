@@ -10,6 +10,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Snaipe.Agent.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Uno.WinUI" Version="6.5.153">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
