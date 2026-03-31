@@ -26,11 +26,21 @@ public sealed record GetTreeRequest : InspectorMessage;
 public sealed record GetPropertiesRequest : InspectorMessage
 {
     public required string ElementId { get; init; }
+    /// <summary>
+    /// CLR property names to traverse from the element root before reading properties.
+    /// Null or empty = read the element's own properties (existing behaviour).
+    /// </summary>
+    public string[]? PropertyPath { get; init; }
 }
 
 public sealed record SetPropertyRequest : InspectorMessage
 {
     public required string ElementId { get; init; }
+    /// <summary>
+    /// CLR property names to traverse from the element root to reach the parent object.
+    /// Null or empty = set a property on the element itself (existing behaviour).
+    /// </summary>
+    public string[]? PropertyPath { get; init; }
     public required string PropertyName { get; init; }
     public required string NewValue { get; init; }
 }

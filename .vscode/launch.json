@@ -5,7 +5,7 @@
       "name": "Run Inspector",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-inspector",
+      "preLaunchTask": "build-solution",
       "program": "${workspaceFolder}/src/Snaipe.Inspector/bin/Debug/net9.0/Snaipe.Inspector.dll",
       "windows": {
         "program": "${workspaceFolder}/src/Snaipe.Inspector/bin/Debug/net9.0-windows/Snaipe.Inspector.dll"
@@ -21,7 +21,7 @@
       "name": "Run SampleApp",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "build-sampleapp",
+      "preLaunchTask": "build-solution",
       "program": "${workspaceFolder}/samples/Snaipe.SampleApp/bin/Debug/net9.0/Snaipe.SampleApp.dll",
       "windows": {
         "program": "${workspaceFolder}/samples/Snaipe.SampleApp/bin/Debug/net9.0-windows/Snaipe.SampleApp.dll"

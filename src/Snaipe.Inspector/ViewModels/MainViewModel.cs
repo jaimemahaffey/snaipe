@@ -33,13 +33,44 @@ public sealed class MainViewModel : ViewModelBase
             FetchTreeAsync,
             () => _state == ConnectionState.Connected);
 
+        DrillIntoCommand = new RelayCommand<PropertyRowViewModel>(row =>
+        {
+            if (row is null) return;
+            var newPath = Breadcrumb.Count > 0
+                ? [.. Breadcrumb.Last().Path, row.Entry.Name]
+                : new[] { row.Entry.Name };
+            Breadcrumb.Add(MakeCrumb(row.Entry.Name, newPath));
+            if (_selectedNode is not null)
+                _ = LoadPropertiesAsync(_selectedNode, newPath);
+        });
+
+        NavigateToBreadcrumbCommand = new RelayCommand<BreadcrumbSegment>(crumb =>
+        {
+            if (crumb is null) return;
+            var idx = Breadcrumb.IndexOf(crumb);
+            if (idx < 0) return;
+            while (Breadcrumb.Count > idx + 1)
+                Breadcrumb.RemoveAt(Breadcrumb.Count - 1);
+            if (_selectedNode is not null)
+                _ = LoadPropertiesAsync(_selectedNode, crumb.Path);
+        });
+
         RefreshAgents();
+    }
+
+    private BreadcrumbSegment MakeCrumb(string label, string[] path)
+    {
+        BreadcrumbSegment? crumb = null;
+        var navigate = new RelayCommand(() => NavigateToBreadcrumbCommand.Execute(crumb));
+        crumb = new BreadcrumbSegment(label, path, navigate);
+        return crumb;
     }
 
     // ── Collections ──────────────────────────────────────────────────────────
     public ObservableCollection<AgentInfo> DiscoveredAgents { get; } = [];
     public ObservableCollection<TreeNodeViewModel> RootNodes { get; } = [];
     public PropertyGridViewModel PropertyGrid { get; } = new();
+    public ObservableCollection<BreadcrumbSegment> Breadcrumb { get; } = [];
 
     // ── State properties ──────────────────────────────────────────────────────
     public bool IsConnected => _state == ConnectionState.Connected;
@@ -83,6 +114,8 @@ public sealed class MainViewModel : ViewModelBase
     public RelayCommand DisconnectCommand { get; }
     public RelayCommand RefreshAgentsCommand { get; }
     public AsyncRelayCommand RefreshTreeCommand { get; }
+    public RelayCommand<PropertyRowViewModel> DrillIntoCommand { get; }
+    public RelayCommand<BreadcrumbSegment>   NavigateToBreadcrumbCommand { get; }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
     private void RefreshCommandStates()
@@ -96,8 +129,10 @@ public sealed class MainViewModel : ViewModelBase
 
     private void ClearSession()
     {
+        _propertiesCts?.Cancel();
         RootNodes.Clear();
         PropertyGrid.Clear();
+        Breadcrumb.Clear();
         _selectedNode = null;
         OnPropertyChanged(nameof(SelectedNode));
     }
@@ -214,13 +249,23 @@ public sealed class MainViewModel : ViewModelBase
     }
     private async Task OnSelectedNodeChangedAsync(TreeNodeViewModel? node)
     {
+        Breadcrumb.Clear();
+        PropertyGrid.Clear();
+        _propertiesCts?.Cancel();
+
+        if (node is null || _state != ConnectionState.Connected) return;
+
+        Breadcrumb.Add(MakeCrumb(node.Node.TypeName, []));
+        await LoadPropertiesAsync(node, []);
+    }
+
+    private async Task LoadPropertiesAsync(TreeNodeViewModel node, string[] path)
+    {
         _propertiesCts?.Cancel();
         _propertiesCts = new CancellationTokenSource();
         var ct = _propertiesCts.Token;
 
         PropertyGrid.Clear();
-        if (node is null || _state != ConnectionState.Connected) return;
-
         IsLoadingProperties = true;
         try
         {
@@ -229,22 +274,32 @@ public sealed class MainViewModel : ViewModelBase
                 {
                     MessageId = Guid.NewGuid().ToString("N"),
                     ElementId = node.Node.Id,
+                    PropertyPath = path.Length > 0 ? path : null,
                 });
 
             if (ct.IsCancellationRequested) return;
 
-            var rows = response.Properties
-                .Select(prop => new PropertyRowViewModel(prop,
-                    row => SetPropertyAsync(node.Node.Id, row.Entry.Name, row.EditValue, row)))
-                .ToList();
+            var capturedPath = path;
+            var rows = response.Properties.Select(prop =>
+            {
+                PropertyRowViewModel? row = null;
+                RelayCommand? drillCmd = prop.IsObjectValued
+                    ? new RelayCommand(() => DrillIntoCommand.Execute(row))
+                    : null;
+                row = new PropertyRowViewModel(prop,
+                    r => SetPropertyAsync(node.Node.Id, capturedPath, r.Entry.Name, r.EditValue, r),
+                    drillCmd);
+                return row;
+            }).ToList();
 
             PropertyGrid.Load(rows);
 
-            _ = SendHighlightAsync(node.Node.Id, show: true);
+            if (path.Length == 0)
+                _ = SendHighlightAsync(node.Node.Id, show: true);
         }
         catch (OperationCanceledException)
         {
-            // Superseded by a newer selection — do nothing.
+            // Superseded — do nothing.
         }
         catch (IOException ex)
         {
@@ -252,7 +307,15 @@ public sealed class MainViewModel : ViewModelBase
         }
         catch (SnaipeProtocolException ex) when (ex.ErrorCode == ErrorCodes.ElementNotFound)
         {
-            StatusMessage = "Element no longer in tree — refresh the tree.";
+            StatusMessage = path.Length > 0
+                ? "Drill-down target no longer available — navigated back to root."
+                : "Element no longer in tree — refresh the tree.";
+            if (path.Length > 0)
+            {
+                Breadcrumb.Clear();
+                if (_selectedNode is not null)
+                    Breadcrumb.Add(MakeCrumb(_selectedNode.Node.TypeName, []));
+            }
         }
         finally
         {
@@ -260,8 +323,8 @@ public sealed class MainViewModel : ViewModelBase
         }
     }
 
-    public async Task SetPropertyAsync(string elementId, string propertyName, string newValue,
-        PropertyRowViewModel row)
+    public async Task SetPropertyAsync(string elementId, string[]? propertyPath,
+        string propertyName, string newValue, PropertyRowViewModel row)
     {
         try
         {
@@ -270,6 +333,7 @@ public sealed class MainViewModel : ViewModelBase
                 {
                     MessageId = Guid.NewGuid().ToString("N"),
                     ElementId = elementId,
+                    PropertyPath = propertyPath?.Length > 0 ? propertyPath : null,
                     PropertyName = propertyName,
                     NewValue = newValue,
                 });
@@ -280,7 +344,6 @@ public sealed class MainViewModel : ViewModelBase
         }
         catch (SnaipeProtocolException ex)
         {
-            // Persistent error state
             row.SetError(ex.Details ?? ex.Message);
         }
         catch (IOException ex)

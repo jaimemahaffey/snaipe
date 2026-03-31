@@ -40,7 +40,8 @@
                 </Grid.RowDefinitions>
 
                 <controls:PropertyGridControl Grid.Row="0"
-                               DataContext="{x:Bind ViewModel.PropertyGrid}"/>
+                               DataContext="{x:Bind ViewModel.PropertyGrid}"
+                               Host="{x:Bind ViewModel}"/>
 
                 <Border Grid.Row="1"
                         Height="4"
