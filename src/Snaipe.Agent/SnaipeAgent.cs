@@ -153,30 +153,49 @@ public sealed class SnaipeAgent : IDisposable
                     return;
                 }
 
-                var properties = PropertyReader.GetProperties(element);
+                List<Protocol.PropertyEntry> properties;
 
-                // Also include bounds info as properties.
-                if (_window.Content is UIElement root)
+                if (request.PropertyPath is { Length: > 0 })
                 {
-                    var bounds = VisualTreeWalker.GetBoundsRelativeTo(element, root);
-                    properties.Insert(0, new PropertyEntry
+                    // Drill-down path: resolve to the nested object and read its CLR properties.
+                    var (resolved, errorCode, errorMessage) =
+                        PropertyPathResolver.Resolve(element, request.PropertyPath);
+
+                    if (resolved is null)
                     {
-                        Name = "Bounds (X)",
-                        Category = "Layout",
-                        ValueType = "Double",
-                        Value = bounds.X.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                        ValueKind = "Number",
-                        IsReadOnly = true,
-                    });
-                    properties.Insert(1, new PropertyEntry
+                        tcs.SetResult(new ErrorResponse
+                        {
+                            MessageId = request.MessageId,
+                            ErrorCode = errorCode,
+                            Error = errorMessage ?? "Path resolution failed",
+                        });
+                        return;
+                    }
+
+                    properties = ObjectPropertyReader.GetProperties(resolved);
+                }
+                else
+                {
+                    // Root-level: existing DependencyProperty reader.
+                    properties = PropertyReader.GetProperties(element);
+
+                    // Prepend live bounds info (only for direct element inspection).
+                    if (_window.Content is UIElement root)
                     {
-                        Name = "Bounds (Y)",
-                        Category = "Layout",
-                        ValueType = "Double",
-                        Value = bounds.Y.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                        ValueKind = "Number",
-                        IsReadOnly = true,
-                    });
+                        var bounds = VisualTreeWalker.GetBoundsRelativeTo(element, root);
+                        properties.Insert(0, new Protocol.PropertyEntry
+                        {
+                            Name = "Bounds (X)", Category = "Layout", ValueType = "Double",
+                            Value = bounds.X.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            ValueKind = "Number", IsReadOnly = true,
+                        });
+                        properties.Insert(1, new Protocol.PropertyEntry
+                        {
+                            Name = "Bounds (Y)", Category = "Layout", ValueType = "Double",
+                            Value = bounds.Y.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            ValueKind = "Number", IsReadOnly = true,
+                        });
+                    }
                 }
 
                 tcs.SetResult(new PropertiesResponse
@@ -221,7 +240,32 @@ public sealed class SnaipeAgent : IDisposable
                     return;
                 }
 
-                var result = PropertyWriter.SetProperty(element, request.PropertyName, request.NewValue);
+                SetPropertyResult result;
+
+                if (request.PropertyPath is { Length: > 0 })
+                {
+                    // Drill-down path: resolve to the nested object, then write the leaf property.
+                    var (resolved, errorCode, errorMessage) =
+                        PropertyPathResolver.Resolve(element, request.PropertyPath);
+
+                    if (resolved is null)
+                    {
+                        tcs.SetResult(new ErrorResponse
+                        {
+                            MessageId = request.MessageId,
+                            ErrorCode = errorCode,
+                            Error = errorMessage ?? "Path resolution failed",
+                        });
+                        return;
+                    }
+
+                    result = ObjectPropertyWriter.SetProperty(resolved, request.PropertyName, request.NewValue);
+                }
+                else
+                {
+                    result = PropertyWriter.SetProperty(element, request.PropertyName, request.NewValue);
+                }
+
                 if (!result.Success)
                 {
                     tcs.SetResult(new ErrorResponse
@@ -234,10 +278,10 @@ public sealed class SnaipeAgent : IDisposable
                     return;
                 }
 
-                tcs.SetResult(new AckResponse 
-                { 
+                tcs.SetResult(new AckResponse
+                {
                     MessageId = request.MessageId,
-                    NormalizedValue = result.NormalizedValue
+                    NormalizedValue = result.NormalizedValue,
                 });
             }
             catch (Exception ex)
