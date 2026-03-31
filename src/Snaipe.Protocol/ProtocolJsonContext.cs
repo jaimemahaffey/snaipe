@@ -22,4 +22,5 @@ namespace Snaipe.Protocol;
 [JsonSerializable(typeof(BoundsInfo))]
 [JsonSerializable(typeof(PropertyEntry))]
 [JsonSerializable(typeof(List<string>))]
+[JsonSerializable(typeof(string[]))]
 internal partial class ProtocolJsonContext : JsonSerializerContext;

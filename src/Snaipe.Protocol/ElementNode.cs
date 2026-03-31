@@ -38,4 +38,9 @@ public sealed class PropertyEntry
     /// can render a ComboBox instead of a free-text field.
     /// </summary>
     public List<string>? EnumValues { get; init; }
+    /// <summary>
+    /// True when ValueKind is "Object" and the value is non-null.
+    /// Inspector renders a drill-down chevron for these rows.
+    /// </summary>
+    public bool IsObjectValued { get; init; }
 }
