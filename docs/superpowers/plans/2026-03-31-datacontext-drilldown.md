@@ -43,7 +43,7 @@
 - Modify: `src/Snaipe.Protocol/Messages.cs`
 - Modify: `src/Snaipe.Protocol/ProtocolJsonContext.cs`
 
-- [ ] **Step 1: Add `IsObjectValued` to `PropertyEntry`**
+- [x] **Step 1: Add `IsObjectValued` to `PropertyEntry`**
 
 In `src/Snaipe.Protocol/ElementNode.cs`, add one property to `PropertyEntry` after `EnumValues`:
 
@@ -55,7 +55,7 @@ In `src/Snaipe.Protocol/ElementNode.cs`, add one property to `PropertyEntry` aft
     public bool IsObjectValued { get; init; }
 ```
 
-- [ ] **Step 2: Add `PropertyPath` to `GetPropertiesRequest`**
+- [x] **Step 2: Add `PropertyPath` to `GetPropertiesRequest`**
 
 In `src/Snaipe.Protocol/Messages.cs`, replace the existing `GetPropertiesRequest` record:
 
@@ -71,7 +71,7 @@ public sealed record GetPropertiesRequest : InspectorMessage
 }
 ```
 
-- [ ] **Step 3: Add `PropertyPath` to `SetPropertyRequest`**
+- [x] **Step 3: Add `PropertyPath` to `SetPropertyRequest`**
 
 Replace the existing `SetPropertyRequest` record:
 
@@ -89,7 +89,7 @@ public sealed record SetPropertyRequest : InspectorMessage
 }
 ```
 
-- [ ] **Step 4: Register `string[]` in the JSON source-gen context**
+- [x] **Step 4: Register `string[]` in the JSON source-gen context**
 
 In `src/Snaipe.Protocol/ProtocolJsonContext.cs`, add one attribute before the class declaration:
 
@@ -99,7 +99,7 @@ In `src/Snaipe.Protocol/ProtocolJsonContext.cs`, add one attribute before the cl
 
 The full attribute list should now include this alongside the existing entries.
 
-- [ ] **Step 5: Build Protocol to verify no errors**
+- [x] **Step 5: Build Protocol to verify no errors**
 
 ```bash
 dotnet build src/Snaipe.Protocol/Snaipe.Protocol.csproj -v quiet
@@ -107,7 +107,7 @@ dotnet build src/Snaipe.Protocol/Snaipe.Protocol.csproj -v quiet
 
 Expected: `Build succeeded. 0 Error(s).`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/Snaipe.Protocol/ElementNode.cs src/Snaipe.Protocol/Messages.cs src/Snaipe.Protocol/ProtocolJsonContext.cs
@@ -124,7 +124,7 @@ git commit -m "feat: add IsObjectValued to PropertyEntry, PropertyPath to reques
 - Modify: `src/Snaipe.Agent/PropertyReader.cs`
 - Modify: `src/Snaipe.Agent/PropertyWriter.cs`
 
-- [ ] **Step 1: Make `GetValueKind` and `FormatValue` internal in `PropertyReader`**
+- [x] **Step 1: Make `GetValueKind` and `FormatValue` internal in `PropertyReader`**
 
 In `src/Snaipe.Agent/PropertyReader.cs`, change:
 
@@ -146,7 +146,7 @@ to:
 internal static string FormatValue(object? value)
 ```
 
-- [ ] **Step 2: Make `ParseValue` internal in `PropertyWriter`**
+- [x] **Step 2: Make `ParseValue` internal in `PropertyWriter`**
 
 In `src/Snaipe.Agent/PropertyWriter.cs`, change:
 
@@ -158,7 +158,7 @@ to:
 internal static object? ParseValue(string value, Type targetType)
 ```
 
-- [ ] **Step 3: Build Agent to verify**
+- [x] **Step 3: Build Agent to verify**
 
 ```bash
 dotnet build src/Snaipe.Agent/Snaipe.Agent.csproj -v quiet
@@ -166,7 +166,7 @@ dotnet build src/Snaipe.Agent/Snaipe.Agent.csproj -v quiet
 
 Expected: `Build succeeded. 0 Error(s).`
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/Snaipe.Agent/PropertyReader.cs src/Snaipe.Agent/PropertyWriter.cs
@@ -182,7 +182,7 @@ git commit -m "refactor: expose GetValueKind, FormatValue, ParseValue as interna
 - Create: `src/Snaipe.Agent/ObjectPropertyReader.cs`
 - Create: `tests/Snaipe.Agent.Tests/ObjectPropertyReaderTests.cs`
 
-- [ ] **Step 1: Create the agent test project**
+- [x] **Step 1: Create the agent test project**
 
 Create `tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj`:
 
@@ -209,7 +209,7 @@ Create `tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj`:
 </Project>
 ```
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 Create `tests/Snaipe.Agent.Tests/ObjectPropertyReaderTests.cs`:
 
@@ -287,7 +287,7 @@ public class ObjectPropertyReaderTests
 }
 ```
 
-- [ ] **Step 3: Run tests — expect compile failure**
+- [x] **Step 3: Run tests — expect compile failure**
 
 ```bash
 dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~ObjectPropertyReaderTests" 2>&1 | tail -5
@@ -295,7 +295,7 @@ dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows
 
 Expected: build error — `ObjectPropertyReader does not exist`.
 
-- [ ] **Step 4: Create `ObjectPropertyReader`**
+- [x] **Step 4: Create `ObjectPropertyReader`**
 
 Create `src/Snaipe.Agent/ObjectPropertyReader.cs`:
 
@@ -349,7 +349,7 @@ public static class ObjectPropertyReader
 }
 ```
 
-- [ ] **Step 5: Run tests — expect pass**
+- [x] **Step 5: Run tests — expect pass**
 
 ```bash
 dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~ObjectPropertyReaderTests" 2>&1 | tail -5
@@ -357,7 +357,7 @@ dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows
 
 Expected: `6 passed, 0 failed`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/Snaipe.Agent/ObjectPropertyReader.cs tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj tests/Snaipe.Agent.Tests/ObjectPropertyReaderTests.cs
@@ -372,7 +372,7 @@ git commit -m "feat: add ObjectPropertyReader for CLR object property inspection
 - Create: `src/Snaipe.Agent/ObjectPropertyWriter.cs`
 - Create: `tests/Snaipe.Agent.Tests/ObjectPropertyWriterTests.cs`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `tests/Snaipe.Agent.Tests/ObjectPropertyWriterTests.cs`:
 
@@ -449,7 +449,7 @@ public class ObjectPropertyWriterTests
 }
 ```
 
-- [ ] **Step 2: Run tests — expect compile failure**
+- [x] **Step 2: Run tests — expect compile failure**
 
 ```bash
 dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~ObjectPropertyWriterTests" 2>&1 | tail -5
@@ -457,7 +457,7 @@ dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows
 
 Expected: build error — `ObjectPropertyWriter does not exist`.
 
-- [ ] **Step 3: Create `ObjectPropertyWriter`**
+- [x] **Step 3: Create `ObjectPropertyWriter`**
 
 Create `src/Snaipe.Agent/ObjectPropertyWriter.cs`:
 
@@ -504,7 +504,7 @@ public static class ObjectPropertyWriter
 }
 ```
 
-- [ ] **Step 4: Run tests — expect pass**
+- [x] **Step 4: Run tests — expect pass**
 
 ```bash
 dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~ObjectPropertyWriterTests" 2>&1 | tail -5
@@ -512,7 +512,7 @@ dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows
 
 Expected: `6 passed, 0 failed`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/Snaipe.Agent/ObjectPropertyWriter.cs tests/Snaipe.Agent.Tests/ObjectPropertyWriterTests.cs
@@ -527,7 +527,7 @@ git commit -m "feat: add ObjectPropertyWriter for CLR object property mutation"
 - Create: `src/Snaipe.Agent/PropertyPathResolver.cs`
 - Create: `tests/Snaipe.Agent.Tests/PropertyPathResolverTests.cs`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `tests/Snaipe.Agent.Tests/PropertyPathResolverTests.cs`:
 
@@ -611,7 +611,7 @@ public class PropertyPathResolverTests
 }
 ```
 
-- [ ] **Step 2: Run tests — expect compile failure**
+- [x] **Step 2: Run tests — expect compile failure**
 
 ```bash
 dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~PropertyPathResolverTests" 2>&1 | tail -5
@@ -619,7 +619,7 @@ dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows
 
 Expected: build error — `PropertyPathResolver does not exist`.
 
-- [ ] **Step 3: Create `PropertyPathResolver`**
+- [x] **Step 3: Create `PropertyPathResolver`**
 
 Create `src/Snaipe.Agent/PropertyPathResolver.cs`:
 
@@ -694,7 +694,7 @@ public static class PropertyPathResolver
 }
 ```
 
-- [ ] **Step 4: Run tests — expect pass**
+- [x] **Step 4: Run tests — expect pass**
 
 ```bash
 dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~PropertyPathResolverTests" 2>&1 | tail -5
@@ -702,7 +702,7 @@ dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows
 
 Expected: `6 passed, 0 failed`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/Snaipe.Agent/PropertyPathResolver.cs tests/Snaipe.Agent.Tests/PropertyPathResolverTests.cs
@@ -716,7 +716,7 @@ git commit -m "feat: add PropertyPathResolver for CLR property path traversal"
 **Files:**
 - Modify: `src/Snaipe.Agent/SnaipeAgent.cs`
 
-- [ ] **Step 1: Refactor `HandleGetProperties` to support `PropertyPath`**
+- [x] **Step 1: Refactor `HandleGetProperties` to support `PropertyPath`**
 
 In `src/Snaipe.Agent/SnaipeAgent.cs`, replace the `HandleGetProperties` method entirely:
 
@@ -809,7 +809,7 @@ private Task<InspectorMessage> HandleGetProperties(GetPropertiesRequest request)
 }
 ```
 
-- [ ] **Step 2: Refactor `HandleSetProperty` to support `PropertyPath`**
+- [x] **Step 2: Refactor `HandleSetProperty` to support `PropertyPath`**
 
 Replace the `HandleSetProperty` method entirely:
 
@@ -894,7 +894,7 @@ private Task<InspectorMessage> HandleSetProperty(SetPropertyRequest request)
 }
 ```
 
-- [ ] **Step 3: Build Agent to verify**
+- [x] **Step 3: Build Agent to verify**
 
 ```bash
 dotnet build src/Snaipe.Agent/Snaipe.Agent.csproj -v quiet
@@ -902,7 +902,7 @@ dotnet build src/Snaipe.Agent/Snaipe.Agent.csproj -v quiet
 
 Expected: `Build succeeded. 0 Error(s).`
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/Snaipe.Agent/SnaipeAgent.cs
@@ -917,7 +917,7 @@ git commit -m "feat: route PropertyPath requests to ObjectPropertyReader/Writer 
 - Create: `src/Snaipe.Inspector/ViewModels/BreadcrumbSegment.cs`
 - Modify: `src/Snaipe.Inspector/ViewModels/MainViewModel.cs`
 
-- [ ] **Step 1: Create `BreadcrumbSegment`**
+- [x] **Step 1: Create `BreadcrumbSegment`**
 
 Create `src/Snaipe.Inspector/ViewModels/BreadcrumbSegment.cs`:
 
@@ -931,7 +931,7 @@ namespace Snaipe.Inspector.ViewModels;
 public record BreadcrumbSegment(string Label, string[] Path);
 ```
 
-- [ ] **Step 2: Add `Breadcrumb`, `DrillIntoCommand`, `NavigateToBreadcrumbCommand` to `MainViewModel`**
+- [x] **Step 2: Add `Breadcrumb`, `DrillIntoCommand`, `NavigateToBreadcrumbCommand` to `MainViewModel`**
 
 In `src/Snaipe.Inspector/ViewModels/MainViewModel.cs`:
 
@@ -974,7 +974,7 @@ NavigateToBreadcrumbCommand = new RelayCommand<BreadcrumbSegment>(crumb =>
 });
 ```
 
-- [ ] **Step 3: Add `LoadPropertiesAsync` private method**
+- [x] **Step 3: Add `LoadPropertiesAsync` private method**
 
 Add this method near `OnSelectedNodeChangedAsync` (it replaces the fetch logic that was inline):
 
@@ -1037,7 +1037,7 @@ private async Task LoadPropertiesAsync(TreeNodeViewModel node, string[] path)
 }
 ```
 
-- [ ] **Step 4: Replace `OnSelectedNodeChangedAsync` to use `LoadPropertiesAsync`**
+- [x] **Step 4: Replace `OnSelectedNodeChangedAsync` to use `LoadPropertiesAsync`**
 
 Replace the existing `OnSelectedNodeChangedAsync` method with:
 
@@ -1055,7 +1055,7 @@ private async Task OnSelectedNodeChangedAsync(TreeNodeViewModel? node)
 }
 ```
 
-- [ ] **Step 5: Update `ClearSession` to clear breadcrumb**
+- [x] **Step 5: Update `ClearSession` to clear breadcrumb**
 
 Replace the existing `ClearSession` method:
 
@@ -1071,7 +1071,7 @@ private void ClearSession()
 }
 ```
 
-- [ ] **Step 6: Update `SetPropertyAsync` to accept `propertyPath`**
+- [x] **Step 6: Update `SetPropertyAsync` to accept `propertyPath`**
 
 Replace the existing `SetPropertyAsync` signature and `SetPropertyRequest` construction:
 
@@ -1110,7 +1110,7 @@ public async Task SetPropertyAsync(string elementId, string[]? propertyPath,
 }
 ```
 
-- [ ] **Step 7: Build Inspector to verify**
+- [x] **Step 7: Build Inspector to verify**
 
 ```bash
 dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v quiet 2>&1 | tail -5
@@ -1118,7 +1118,7 @@ dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v q
 
 Expected: `Build succeeded. 0 Error(s).` (Uno warnings about `LostFocus` and `ProgressRing` are expected and harmless.)
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/Snaipe.Inspector/ViewModels/BreadcrumbSegment.cs src/Snaipe.Inspector/ViewModels/MainViewModel.cs
@@ -1133,7 +1133,7 @@ git commit -m "feat: add breadcrumb navigation and drill-down commands to MainVi
 - Modify: `src/Snaipe.Inspector/Controls/PropertyGridControl.xaml`
 - Modify: `src/Snaipe.Inspector/Controls/PropertyGridControl.xaml.cs`
 
-- [ ] **Step 1: Add `DrillVisibility` computed property to `PropertyRowViewModel`**
+- [x] **Step 1: Add `DrillVisibility` computed property to `PropertyRowViewModel`**
 
 In `src/Snaipe.Inspector/ViewModels/PropertyRowViewModel.cs`, add after the `ErrorBorderBrush` property:
 
@@ -1145,7 +1145,7 @@ public Microsoft.UI.Xaml.Visibility DrillVisibility =>
         : Microsoft.UI.Xaml.Visibility.Collapsed;
 ```
 
-- [ ] **Step 2: Add `Host` dependency property to `PropertyGridControl.xaml.cs`**
+- [x] **Step 2: Add `Host` dependency property to `PropertyGridControl.xaml.cs`**
 
 Replace the entire `PropertyGridControl.xaml.cs` with:
 
@@ -1191,7 +1191,7 @@ public sealed partial class PropertyGridControl : UserControl
 }
 ```
 
-- [ ] **Step 3: Replace `PropertyGridControl.xaml` with breadcrumb row and chevron affordance**
+- [x] **Step 3: Replace `PropertyGridControl.xaml` with breadcrumb row and chevron affordance**
 
 Replace the entire `src/Snaipe.Inspector/Controls/PropertyGridControl.xaml` with:
 
@@ -1435,7 +1435,7 @@ Replace the entire `src/Snaipe.Inspector/Controls/PropertyGridControl.xaml` with
 </UserControl>
 ```
 
-- [ ] **Step 4: Build to verify**
+- [x] **Step 4: Build to verify**
 
 ```bash
 dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v quiet 2>&1 | tail -5
@@ -1443,7 +1443,7 @@ dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v q
 
 Expected: `Build succeeded.`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/Snaipe.Inspector/ViewModels/PropertyRowViewModel.cs src/Snaipe.Inspector/Controls/PropertyGridControl.xaml src/Snaipe.Inspector/Controls/PropertyGridControl.xaml.cs
@@ -1458,7 +1458,7 @@ git commit -m "feat: add breadcrumb row and drill-down chevron to PropertyGridCo
 - Modify: `src/Snaipe.Inspector/MainWindow.xaml`
 - Modify: `tests/Snaipe.Inspector.Tests/MainViewModelTests.cs`
 
-- [ ] **Step 1: Pass `Host` in `MainWindow.xaml`**
+- [x] **Step 1: Pass `Host` in `MainWindow.xaml`**
 
 In `src/Snaipe.Inspector/MainWindow.xaml`, replace the `PropertyGridControl` element:
 
@@ -1468,7 +1468,7 @@ In `src/Snaipe.Inspector/MainWindow.xaml`, replace the `PropertyGridControl` ele
                Host="{x:Bind ViewModel}"/>
 ```
 
-- [ ] **Step 2: Build to verify**
+- [x] **Step 2: Build to verify**
 
 ```bash
 dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v quiet 2>&1 | tail -5
@@ -1476,7 +1476,7 @@ dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v q
 
 Expected: `Build succeeded.`
 
-- [ ] **Step 3: Write failing tests for `MainViewModel` breadcrumb behavior**
+- [x] **Step 3: Write failing tests for `MainViewModel` breadcrumb behavior**
 
 In `tests/Snaipe.Inspector.Tests/MainViewModelTests.cs`, append these test methods inside the `MainViewModelTests` class:
 
@@ -1553,7 +1553,7 @@ In `tests/Snaipe.Inspector.Tests/MainViewModelTests.cs`, append these test metho
     }
 ```
 
-- [ ] **Step 4: Run all tests**
+- [x] **Step 4: Run all tests**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows 2>&1 | tail -6
@@ -1561,7 +1561,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: all tests pass (previous 36 + 5 new = 41 passed, 0 failed).
 
-- [ ] **Step 5: Run agent tests to confirm still passing**
+- [x] **Step 5: Run agent tests to confirm still passing**
 
 ```bash
 dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows 2>&1 | tail -5
@@ -1569,7 +1569,7 @@ dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows
 
 Expected: `18 passed, 0 failed`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/Snaipe.Inspector/MainWindow.xaml tests/Snaipe.Inspector.Tests/MainViewModelTests.cs
