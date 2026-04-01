@@ -322,10 +322,14 @@ public sealed class MainViewModel : ViewModelBase
                 RelayCommand? jumpCmd = prop.TemplateOriginKind is { } kind
                     ? new RelayCommand(() => JumpToTemplateRoot(kind))
                     : null;
+                RelayCommand? chainCmd = prop.ValueChain is { Count: > 0 }
+                    ? new RelayCommand(() => PropertyGrid.ShowValueChain(row!))
+                    : null;
                 row = new PropertyRowViewModel(prop,
                     r => SetPropertyAsync(node.Node.Id, capturedPath, r.Entry.Name, r.EditValue, r),
                     drillCmd,
-                    jumpCmd);
+                    jumpCmd,
+                    chainCmd);
                 return row;
             }).ToList();
 

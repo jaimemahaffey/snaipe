@@ -9,9 +9,14 @@ public sealed class PropertyGridViewModel : ViewModelBase
     private string _activeSortColumn = "Category";
     private bool _sortAscending = true;
 
+    private PropertyRowViewModel? _activeChainRow;
+    private ValueChainEntryViewModel[]? _activeValueChain;
+    private string? _valueChainPropertyName;
+
     public PropertyGridViewModel()
     {
         SortByCommand = new RelayCommand<string>(SortBy);
+        ClearValueChainCommand = new RelayCommand(ClearValueChain);
     }
 
     public ObservableCollection<PropertyRowViewModel> FilteredProperties { get; } = [];
@@ -30,6 +35,56 @@ public sealed class PropertyGridViewModel : ViewModelBase
     public bool SortAscending => _sortAscending;
 
     public RelayCommand<string> SortByCommand { get; }
+    public RelayCommand ClearValueChainCommand { get; }
+
+    public ValueChainEntryViewModel[]? ActiveValueChain
+    {
+        get => _activeValueChain;
+        private set
+        {
+            if (SetField(ref _activeValueChain, value))
+                OnPropertyChanged(nameof(ValueChainPanelVisibility));
+        }
+    }
+
+    public string? ValueChainPropertyName
+    {
+        get => _valueChainPropertyName;
+        private set => SetField(ref _valueChainPropertyName, value);
+    }
+
+    public Microsoft.UI.Xaml.Visibility ValueChainPanelVisibility =>
+        _activeValueChain is not null
+            ? Microsoft.UI.Xaml.Visibility.Visible
+            : Microsoft.UI.Xaml.Visibility.Collapsed;
+
+    /// <summary>
+    /// Shows the value chain panel for <paramref name="row"/>. Calling with the same row
+    /// a second time toggles the panel off.
+    /// </summary>
+    public void ShowValueChain(PropertyRowViewModel row)
+    {
+        if (row.ValueChain is null) return;
+
+        // Toggle: clicking same row again closes panel
+        if (ReferenceEquals(_activeChainRow, row) && ActiveValueChain is not null)
+        {
+            ClearValueChain();
+            return;
+        }
+
+        _activeChainRow = row;
+        ActiveValueChain = row.ValueChain.ToArray();
+        ValueChainPropertyName = $"{row.Entry.Name} — value chain";
+    }
+
+    /// <summary>Hides the value chain panel.</summary>
+    public void ClearValueChain()
+    {
+        _activeChainRow = null;
+        ActiveValueChain = null;
+        ValueChainPropertyName = null;
+    }
 
     public string NameColumnHeader     => "NAME"     + SortIndicator("Name");
     public string TypeColumnHeader     => "TYPE"     + SortIndicator("Type");
@@ -46,6 +101,7 @@ public sealed class PropertyGridViewModel : ViewModelBase
     {
         _allProperties = [];
         FilteredProperties.Clear();
+        ClearValueChain();
     }
 
     private void SortBy(string? column)
