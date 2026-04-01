@@ -16,7 +16,8 @@ public sealed class PropertyRowViewModel : ViewModelBase
     public PropertyRowViewModel(PropertyEntry entry,
         Func<PropertyRowViewModel, Task>? commit = null,
         RelayCommand? drillCommand = null,
-        RelayCommand? jumpToTemplateCommand = null)
+        RelayCommand? jumpToTemplateCommand = null,
+        RelayCommand? showValueChainCommand = null)
     {
         Entry = entry;
         _editValue = entry.Value ?? string.Empty;
@@ -26,6 +27,10 @@ public sealed class PropertyRowViewModel : ViewModelBase
             () => !Entry.IsReadOnly);
         DrillCommand = drillCommand;
         JumpToTemplateCommand = jumpToTemplateCommand;
+        ShowValueChainCommand = showValueChainCommand;
+        ValueChain = entry.ValueChain?
+            .Select(e => new ValueChainEntryViewModel(e))
+            .ToArray();
     }
 
     public PropertyEntry Entry { get; }
@@ -51,6 +56,20 @@ public sealed class PropertyRowViewModel : ViewModelBase
     public AsyncRelayCommand CommitEditCommand { get; }
     public RelayCommand? DrillCommand { get; }
     public RelayCommand? JumpToTemplateCommand { get; }
+
+    public RelayCommand? ShowValueChainCommand { get; }
+
+    /// <summary>
+    /// The value chain for this dependency property row, built from protocol data.
+    /// Null for synthetic rows (Data Context, Style meta, etc.) and default-only properties.
+    /// </summary>
+    public IReadOnlyList<ValueChainEntryViewModel>? ValueChain { get; }
+
+    /// <summary>Visibility for the value-chain ? button in the Name column.</summary>
+    public Microsoft.UI.Xaml.Visibility ShowValueChainVisibility =>
+        ValueChain is { Count: > 0 }
+            ? Microsoft.UI.Xaml.Visibility.Visible
+            : Microsoft.UI.Xaml.Visibility.Collapsed;
 
     /// <summary>Visibility for the jump-to-template button in the Name column.</summary>
     public Microsoft.UI.Xaml.Visibility JumpToTemplateVisibility =>

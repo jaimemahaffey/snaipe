@@ -94,4 +94,30 @@ public class PropertyRowViewModelTests
         var vm = new PropertyRowViewModel(entry);
         Assert.Null(vm.JumpToTemplateCommand);
     }
+
+    [Fact]
+    public void ShowValueChainVisibility_WithChain_IsVisible()
+    {
+        var entry = new PropertyEntry
+        {
+            Name = "Background", Category = "Appearance", ValueKind = "Object",
+            ValueChain =
+            [
+                new ValueChainEntry { Source = "Local", Value = "Blue", IsWinner = true },
+                new ValueChainEntry { Source = "Default", Value = "null" }
+            ]
+        };
+        var vm = new PropertyRowViewModel(entry);
+
+        Assert.Equal(Microsoft.UI.Xaml.Visibility.Visible, vm.ShowValueChainVisibility);
+    }
+
+    [Fact]
+    public void ShowValueChainVisibility_NullChain_IsCollapsed()
+    {
+        var entry = new PropertyEntry { Name = "Width", Category = "Layout", ValueKind = "Number" };
+        var vm = new PropertyRowViewModel(entry);
+
+        Assert.Equal(Microsoft.UI.Xaml.Visibility.Collapsed, vm.ShowValueChainVisibility);
+    }
 }
