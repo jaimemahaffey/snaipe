@@ -45,6 +45,7 @@ public static class PropertyReader
                 var effectiveType = Nullable.GetUnderlyingType(valueType) ?? valueType;
 
                 var kind = GetValueKind(valueType);
+                var chain = BuildValueChain(element, dpInfo.Property, value, localValue);
                 entries.Add(new Protocol.PropertyEntry
                 {
                     Name = dpInfo.Name,
@@ -56,6 +57,7 @@ public static class PropertyReader
                     IsObjectValued = kind == "Object" && value is not null,
                     BindingExpression = bindingExpression,
                     EnumValues = effectiveType.IsEnum ? Enum.GetNames(effectiveType).ToList() : null,
+                    ValueChain = chain,
                 });
             }
             catch
@@ -490,6 +492,132 @@ public static class PropertyReader
             current = current.BaseType;
         }
         return null;
+    }
+
+    /// <summary>
+    /// Checks whether the currently-active visual state on <paramref name="fe"/> has a setter
+    /// targeting <paramref name="dp"/>. Returns the first match found across all groups.
+    /// Skips setters with a Target property (template-internal setters, out of v1 scope).
+    /// </summary>
+    private static (bool Found, string StateName, object? Value) TryGetActiveVisualStateSetter(
+        FrameworkElement fe, DependencyProperty dp)
+    {
+        try
+        {
+            var groups = VisualStateManager.GetVisualStateGroups(fe);
+            if (groups is null) return default;
+
+            foreach (var group in groups)
+            {
+                var state = group.CurrentState;
+                if (state is null) continue;
+
+                foreach (var setterBase in state.Setters)
+                {
+                    if (setterBase is not Setter setter) continue;
+                    try
+                    {
+                        if (setter.Property == dp)
+                            return (true, state.Name ?? "(unnamed)", setter.Value);
+                    }
+                    catch { }
+                }
+            }
+        }
+        catch { }
+        return default;
+    }
+
+    /// <summary>
+    /// Checks whether <paramref name="style"/> has a setter targeting <paramref name="dp"/>.
+    /// </summary>
+    private static (bool Found, object? Value) TryGetStyleSetter(Style style, DependencyProperty dp)
+    {
+        foreach (var setterBase in style.Setters)
+        {
+            if (setterBase is not Setter setter) continue;
+            try
+            {
+                if (setter.Property == dp)
+                    return (true, setter.Value);
+            }
+            catch { }
+        }
+        return default;
+    }
+
+    /// <summary>
+    /// Builds the value chain for a single dependency property on <paramref name="element"/>.
+    /// Returns null when the only source is the metadata default (no interesting chain).
+    /// </summary>
+    private static List<Protocol.ValueChainEntry>? BuildValueChain(
+        DependencyObject element,
+        DependencyProperty dp,
+        object? effectiveValue,
+        object? localValue)
+    {
+        var entries = new List<Protocol.ValueChainEntry>();
+        var fe = element as FrameworkElement;
+
+        // 1. Binding or Local
+        if (localValue != DependencyProperty.UnsetValue)
+        {
+            if (localValue is BindingExpression be)
+                entries.Add(new Protocol.ValueChainEntry { Source = "Binding", Value = FormatBindingExpression(be) });
+            else
+                entries.Add(new Protocol.ValueChainEntry { Source = "Local", Value = FormatValue(localValue) });
+        }
+
+        // 2. Active VisualState setter
+        if (fe is not null)
+        {
+            var (found, stateName, vsValue) = TryGetActiveVisualStateSetter(fe, dp);
+            if (found)
+                entries.Add(new Protocol.ValueChainEntry
+                    { Source = $"VisualState ({stateName})", Value = FormatValue(vsValue) });
+        }
+
+        // 3. Explicit Style + BasedOn chain
+        if (fe?.Style is { } style)
+        {
+            var depth = 0;
+            var current = style;
+            while (current is not null && depth <= 10)
+            {
+                var (found, setterValue) = TryGetStyleSetter(current, dp);
+                if (found)
+                {
+                    var source = depth == 0 ? "Style" : "BasedOn Style";
+                    entries.Add(new Protocol.ValueChainEntry { Source = source, Value = FormatValue(setterValue) });
+                }
+                current = current.BasedOn;
+                depth++;
+            }
+        }
+
+        // 4. Default Style (inferred: value differs from metadata default but nothing above set it)
+        object? metaDefault;
+        try { metaDefault = dp.GetMetadata(element.GetType()).DefaultValue; }
+        catch { metaDefault = null; }
+
+        var effectiveFormatted = FormatValue(effectiveValue);
+        var metaFormatted = FormatValue(metaDefault);
+
+        if (entries.Count == 0 && effectiveFormatted != metaFormatted)
+            entries.Add(new Protocol.ValueChainEntry { Source = "Default Style", Value = effectiveFormatted });
+
+        // 5. Default (metadata floor — always appended)
+        entries.Add(new Protocol.ValueChainEntry { Source = "Default", Value = metaFormatted });
+
+        // Suppress when the only source is Default (nothing interesting)
+        if (entries.Count == 1)
+            return null;
+
+        // Winner is always entries[0] (list is built in precedence order)
+        entries[0] = new Protocol.ValueChainEntry
+            { Source = entries[0].Source, Value = entries[0].Value, IsWinner = true };
+
+        return entries;
     }
 
     private static List<Protocol.PropertyEntry> GetTemplateEntries(DependencyObject element)
