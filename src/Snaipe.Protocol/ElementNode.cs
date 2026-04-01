@@ -57,9 +57,34 @@ public sealed class PropertyEntry
     public bool IsObjectValued { get; init; }
     /// <summary>
     /// When set, this property row is a template navigation target.
-    /// The Inspector renders a jump arrow and on click performs a client-side
-    /// DFS search for a descendant node with matching TemplateOrigin.
     /// Values: "ControlTemplate" | "ContentTemplate" | "ItemTemplate"
     /// </summary>
     public string? TemplateOriginKind { get; init; }
+    /// <summary>
+    /// All currently-active contributing sources for this dependency property, ordered
+    /// highest→lowest precedence. Null for synthetic entries (Data Context, Style meta, etc.)
+    /// and when the only source is the metadata default.
+    /// </summary>
+    public List<ValueChainEntry>? ValueChain { get; init; }
+}
+
+/// <summary>
+/// One entry in a dependency property value chain.
+/// </summary>
+public sealed class ValueChainEntry
+{
+    /// <summary>
+    /// Source label. One of:
+    ///   "Local" | "Binding" | "VisualState (StateName)" |
+    ///   "Style" | "BasedOn Style" | "Default Style" | "Default"
+    /// </summary>
+    public required string Source { get; init; }
+
+    /// <summary>Human-readable formatted value string.</summary>
+    public required string Value { get; init; }
+
+    /// <summary>
+    /// True on the one entry whose value is the effective value (highest precedence present).
+    /// </summary>
+    public bool IsWinner { get; init; }
 }
