@@ -1,4 +1,6 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using Snaipe.Protocol;
 
@@ -23,7 +25,7 @@ public static class VisualTreeWalker
     /// </summary>
     public static ElementNode BuildTree(UIElement root, ElementTracker tracker)
     {
-        return Walk(root, root, tracker, depth: 0);
+        return Walk(root, parent: null, root, tracker, depth: 0);
     }
 
     /// <summary>
@@ -34,7 +36,8 @@ public static class VisualTreeWalker
         return WalkLegacy(root);
     }
 
-    private static ElementNode Walk(DependencyObject obj, UIElement treeRoot, ElementTracker tracker, int depth)
+    private static ElementNode Walk(DependencyObject obj, DependencyObject? parent,
+        UIElement treeRoot, ElementTracker tracker, int depth)
     {
         var element = obj as UIElement;
         var fe = obj as FrameworkElement;
@@ -47,6 +50,8 @@ public static class VisualTreeWalker
         if (element is not null)
             tracker.UpdateReverseLookup(element);
 
+        var (templateOrigin, templateInstanceCount) = DetectTemplateOrigin(obj, parent);
+
         var node = new ElementNode
         {
             Id = id,
@@ -54,6 +59,8 @@ public static class VisualTreeWalker
             Name = fe?.Name,
             // Bounds deferred for performance — computed on GetProperties or Highlight.
             Bounds = null,
+            TemplateOrigin = templateOrigin,
+            TemplateInstanceCount = templateInstanceCount,
         };
 
         if (depth >= MaxDepth)
@@ -76,7 +83,7 @@ public static class VisualTreeWalker
         for (var i = 0; i < limit; i++)
         {
             var child = VisualTreeHelper.GetChild(obj, i);
-            node.Children.Add(Walk(child, treeRoot, tracker, depth + 1));
+            node.Children.Add(Walk(child, obj, treeRoot, tracker, depth + 1));
         }
 
         if (totalChildren > MaxChildrenPerNode)
@@ -89,6 +96,81 @@ public static class VisualTreeWalker
         }
 
         return node;
+    }
+
+    /// <summary>
+    /// Determines whether <paramref name="child"/> is the root of an instantiated template.
+    /// Returns (origin, instanceCount) or (null, null) if not a template root.
+    /// </summary>
+    private static (string? Origin, int? InstanceCount) DetectTemplateOrigin(
+        DependencyObject child, DependencyObject? parent)
+    {
+        if (parent is null) return (null, null);
+
+        // ControlTemplate root: first visual child of a Control that has a Template set.
+        if (parent is Control ctrl && ctrl.Template is not null)
+        {
+            if (VisualTreeHelper.GetChildrenCount(parent) > 0 &&
+                VisualTreeHelper.GetChild(parent, 0) == child)
+                return ("ControlTemplate", null);
+        }
+
+        // ContentTemplate / ItemTemplate root: first visual child of a ContentPresenter
+        // that has a ContentTemplate set.
+        if (parent is ContentPresenter cp && cp.ContentTemplate is not null)
+        {
+            if (VisualTreeHelper.GetChildrenCount(parent) > 0 &&
+                VisualTreeHelper.GetChild(parent, 0) == child)
+            {
+                // Walk up the visual parent chain (max 5 levels) to detect a SelectorItem
+                // ancestor, which indicates we are inside an item container (ItemTemplate).
+                DependencyObject? ancestor = VisualTreeHelper.GetParent(parent);
+                for (var i = 0; i < 5 && ancestor is not null; i++)
+                {
+                    if (ancestor is SelectorItem)
+                    {
+                        var itemsControl = FindAncestorItemsControl(ancestor);
+                        var count = itemsControl is not null
+                            ? CountSelectorItems(itemsControl)
+                            : 1;
+                        return ("ItemTemplate", count);
+                    }
+                    ancestor = VisualTreeHelper.GetParent(ancestor);
+                }
+                return ("ContentTemplate", null);
+            }
+        }
+
+        return (null, null);
+    }
+
+    private static ItemsControl? FindAncestorItemsControl(DependencyObject node)
+    {
+        var current = VisualTreeHelper.GetParent(node);
+        while (current is not null)
+        {
+            if (current is ItemsControl ic) return ic;
+            current = VisualTreeHelper.GetParent(current);
+        }
+        return null;
+    }
+
+    private static int CountSelectorItems(DependencyObject root)
+    {
+        var count = 0;
+        CountSelectorItemsRecursive(root, ref count);
+        return count;
+    }
+
+    private static void CountSelectorItemsRecursive(DependencyObject node, ref int count)
+    {
+        var childCount = VisualTreeHelper.GetChildrenCount(node);
+        for (var i = 0; i < childCount; i++)
+        {
+            var child = VisualTreeHelper.GetChild(node, i);
+            if (child is SelectorItem) count++;
+            CountSelectorItemsRecursive(child, ref count);
+        }
     }
 
     private static ElementNode WalkLegacy(DependencyObject obj)
