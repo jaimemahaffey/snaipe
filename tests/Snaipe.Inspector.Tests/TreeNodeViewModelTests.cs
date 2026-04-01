@@ -48,4 +48,42 @@ public class TreeNodeViewModelTests
         var vm = new TreeNodeViewModel(MakeNode("1", "Border"));
         Assert.Empty(vm.Children);
     }
+
+    [Fact]
+    public void TemplateLabel_ControlTemplate_ReturnsOriginString()
+    {
+        var node = new ElementNode { Id = "1", TypeName = "Border", TemplateOrigin = "ControlTemplate" };
+        var vm = new TreeNodeViewModel(node);
+        Assert.Equal("ControlTemplate", vm.TemplateLabel);
+    }
+
+    [Fact]
+    public void TemplateLabel_ItemTemplateWithCount_ReturnsCountSuffix()
+    {
+        var node = new ElementNode { Id = "1", TypeName = "Grid", TemplateOrigin = "ItemTemplate", TemplateInstanceCount = 5 };
+        var vm = new TreeNodeViewModel(node);
+        Assert.Equal("ItemTemplate ×5", vm.TemplateLabel);
+    }
+
+    [Fact]
+    public void TemplateLabel_Null_ReturnsNull()
+    {
+        var vm = new TreeNodeViewModel(MakeNode("1", "Button"));
+        Assert.Null(vm.TemplateLabel);
+    }
+
+    [Fact]
+    public void TemplateLabelVisibility_NullOrigin_IsCollapsed()
+    {
+        var vm = new TreeNodeViewModel(MakeNode("1", "Button"));
+        Assert.Equal(Microsoft.UI.Xaml.Visibility.Collapsed, vm.TemplateLabelVisibility);
+    }
+
+    [Fact]
+    public void TemplateLabelVisibility_WithOrigin_IsVisible()
+    {
+        var node = new ElementNode { Id = "1", TypeName = "Border", TemplateOrigin = "ContentTemplate" };
+        var vm = new TreeNodeViewModel(node);
+        Assert.Equal(Microsoft.UI.Xaml.Visibility.Visible, vm.TemplateLabelVisibility);
+    }
 }

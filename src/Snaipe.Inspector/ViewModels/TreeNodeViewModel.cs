@@ -31,4 +31,17 @@ public sealed class TreeNodeViewModel : ViewModelBase
         get => _isSelected;
         set => SetField(ref _isSelected, value);
     }
+
+    public string? TemplateLabel =>
+        Node.TemplateOrigin switch
+        {
+            "ItemTemplate" when Node.TemplateInstanceCount is { } n => $"ItemTemplate ×{n}",
+            { } origin => origin,
+            _ => null
+        };
+
+    public Microsoft.UI.Xaml.Visibility TemplateLabelVisibility =>
+        TemplateLabel is not null
+            ? Microsoft.UI.Xaml.Visibility.Visible
+            : Microsoft.UI.Xaml.Visibility.Collapsed;
 }
