@@ -73,4 +73,25 @@ public class PropertyRowViewModelTests
         vm.EditValue = "42";
         Assert.Equal(42.0, vm.NumberValue);
     }
+
+    [Fact]
+    public void JumpToTemplateCommand_WhenSet_IsNonNull()
+    {
+        var entry = new PropertyEntry
+        {
+            Name = "ControlTemplate", Category = "Template",
+            ValueKind = "String", TemplateOriginKind = "ControlTemplate"
+        };
+        var cmd = new RelayCommand(() => { });
+        var vm = new PropertyRowViewModel(entry, jumpToTemplateCommand: cmd);
+        Assert.NotNull(vm.JumpToTemplateCommand);
+    }
+
+    [Fact]
+    public void JumpToTemplateCommand_WhenNotSet_IsNull()
+    {
+        var entry = new PropertyEntry { Name = "Width", Category = "Layout", ValueKind = "Number" };
+        var vm = new PropertyRowViewModel(entry);
+        Assert.Null(vm.JumpToTemplateCommand);
+    }
 }

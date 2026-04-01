@@ -15,7 +15,8 @@ public sealed class PropertyRowViewModel : ViewModelBase
 
     public PropertyRowViewModel(PropertyEntry entry,
         Func<PropertyRowViewModel, Task>? commit = null,
-        RelayCommand? drillCommand = null)
+        RelayCommand? drillCommand = null,
+        RelayCommand? jumpToTemplateCommand = null)
     {
         Entry = entry;
         _editValue = entry.Value ?? string.Empty;
@@ -24,6 +25,7 @@ public sealed class PropertyRowViewModel : ViewModelBase
             () => _commit?.Invoke(this) ?? Task.CompletedTask,
             () => !Entry.IsReadOnly);
         DrillCommand = drillCommand;
+        JumpToTemplateCommand = jumpToTemplateCommand;
     }
 
     public PropertyEntry Entry { get; }
@@ -48,6 +50,13 @@ public sealed class PropertyRowViewModel : ViewModelBase
 
     public AsyncRelayCommand CommitEditCommand { get; }
     public RelayCommand? DrillCommand { get; }
+    public RelayCommand? JumpToTemplateCommand { get; }
+
+    /// <summary>Visibility for the jump-to-template button in the Name column.</summary>
+    public Microsoft.UI.Xaml.Visibility JumpToTemplateVisibility =>
+        JumpToTemplateCommand is not null
+            ? Microsoft.UI.Xaml.Visibility.Visible
+            : Microsoft.UI.Xaml.Visibility.Collapsed;
 
     public void SetError(string message)
     {
