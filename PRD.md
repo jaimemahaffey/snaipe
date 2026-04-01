@@ -1,20 +1,20 @@
-# DataContext Drill-Down — Ralph Loop Prompt
+# Dependency Property Value Chain — Ralph Loop Prompt
 
 ## Your Job
 
-You are implementing the DataContext / ViewModel drill-down feature for the Snaipe visual tree inspector. Each time you run, find the next unchecked step in the plan, execute it, check it off, and commit. Stop after completing one logical step (one `- [ ]` item or one `### Task N` block if it contains only small steps).
+You are implementing the DP value chain feature for the Snaipe visual tree inspector. Each time you run, find the next unchecked step in the plan, execute it, check it off, and commit. Stop after completing one logical step (one `- [ ]` item or one `### Task N` block if it contains only small steps).
 
 ## Context
 
 - **Project:** Snaipe — a cross-platform visual tree inspector for Uno Platform desktop apps
-- **Spec:** `docs/superpowers/specs/2026-03-31-datacontext-drilldown-design.md`
-- **Plan:** `docs/superpowers/plans/2026-03-31-datacontext-drilldown.md`
-- **Branch:** `feature/property-editor-feedback`
+- **Spec:** `docs/superpowers/specs/2026-03-31-dp-value-source-design.md`
+- **Plan:** `docs/superpowers/plans/2026-03-31-dp-value-source.md`
+- **Branch:** `main`
 - **Target framework:** `net9.0-windows`
 
 ## How to Orient Yourself Each Iteration
 
-1. Read `docs/superpowers/plans/2026-03-31-datacontext-drilldown.md`
+1. Read `docs/superpowers/plans/2026-03-31-dp-value-source.md`
 2. Find the first unchecked step: `- [ ]`
 3. Execute that step exactly as written — the plan contains complete code for every step
 4. Check it off: change `- [ ]` to `- [x]`
@@ -31,24 +31,24 @@ You are implementing the DataContext / ViewModel drill-down feature for the Snai
 ## Build and Test Commands
 
 ```bash
-# Build Inspector project
-dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v quiet
+# Build Protocol project
+dotnet build src/Snaipe.Protocol/Snaipe.Protocol.csproj -v quiet
 
 # Build Agent project
 dotnet build src/Snaipe.Agent/Snaipe.Agent.csproj -v quiet
 
+# Build Inspector project
+dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v quiet
+
 # Run Inspector tests
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows
 
-# Run Agent tests (created in Task 3)
-dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows
-
-# Run a specific test class
-dotnet test tests/Snaipe.Agent.Tests/Snaipe.Agent.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~ObjectPropertyReaderTests"
+# Run a specific test filter
+dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~ValueChain"
 ```
 
 ## Completion
 
 When all steps in the plan are checked off (`- [x]`) and all tests pass, output:
 
-<promise>DATACONTEXT DRILLDOWN COMPLETE</promise>
+<promise>DEPENDENCY PROPERTY VALUE CHAIN COMPLETE</promise>
