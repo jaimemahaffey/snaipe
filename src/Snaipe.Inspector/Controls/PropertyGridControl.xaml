@@ -189,7 +189,7 @@
                             <ColumnDefinition Width="50"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Name column: label + drill chevron -->
+                        <!-- Name column: label + jump-to-template arrow + drill chevron -->
                         <Grid Grid.Column="0">
                             <TextBlock Text="{x:Bind Entry.Name}"
                                        FontSize="12"
@@ -197,10 +197,18 @@
                                        TextTrimming="CharacterEllipsis"
                                        HorizontalAlignment="Left"
                                        ToolTipService.ToolTip="{x:Bind Entry.Name}"/>
-                            <Button Content="›"
-                                    Visibility="{x:Bind DrillVisibility}"
-                                    Command="{x:Bind DrillCommand}"
-                                    Style="{StaticResource ChevronButtonStyle}"/>
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center">
+                                <Button Content="↗"
+                                        Visibility="{x:Bind JumpToTemplateVisibility}"
+                                        Command="{x:Bind JumpToTemplateCommand}"
+                                        Style="{StaticResource ChevronButtonStyle}"/>
+                                <Button Content="›"
+                                        Visibility="{x:Bind DrillVisibility}"
+                                        Command="{x:Bind DrillCommand}"
+                                        Style="{StaticResource ChevronButtonStyle}"/>
+                            </StackPanel>
                         </Grid>
 
                         <ContentPresenter Grid.Column="1"

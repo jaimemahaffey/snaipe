@@ -20,8 +20,20 @@
                   SelectionMode="Single">
             <TreeView.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Content.DisplayName}"
-                               FontSize="12"/>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="{Binding Content.DisplayName}"
+                                   FontSize="12"
+                                   VerticalAlignment="Center"/>
+                        <Border Background="#33007AFF"
+                                CornerRadius="4"
+                                Padding="4,1"
+                                VerticalAlignment="Center"
+                                Visibility="{Binding Content.TemplateLabelVisibility}">
+                            <TextBlock Text="{Binding Content.TemplateLabel}"
+                                       FontSize="10"
+                                       Foreground="#007AFF"/>
+                        </Border>
+                    </StackPanel>
                 </DataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>

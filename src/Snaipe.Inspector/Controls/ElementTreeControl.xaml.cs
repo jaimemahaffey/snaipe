@@ -9,6 +9,7 @@ namespace Snaipe.Inspector.Controls;
 public sealed partial class ElementTreeControl : UserControl
 {
     private MainViewModel? _subscribedVm;
+    private readonly Dictionary<TreeNodeViewModel, TreeViewNode> _nodeMap = new();
 
     public ElementTreeControl()
     {
@@ -26,13 +27,17 @@ public sealed partial class ElementTreeControl : UserControl
         Bindings.Update();
 
         if (_subscribedVm is not null)
+        {
             _subscribedVm.RootNodes.CollectionChanged -= OnRootNodesChanged;
+            _subscribedVm.ScrollIntoViewRequested -= OnScrollIntoViewRequested;
+        }
 
         _subscribedVm = args.NewValue as MainViewModel;
 
         if (_subscribedVm is not null)
         {
             _subscribedVm.RootNodes.CollectionChanged += OnRootNodesChanged;
+            _subscribedVm.ScrollIntoViewRequested += OnScrollIntoViewRequested;
             RebuildTree(_subscribedVm.RootNodes);
         }
     }
@@ -45,21 +50,32 @@ public sealed partial class ElementTreeControl : UserControl
 
     private void RebuildTree(System.Collections.ObjectModel.ObservableCollection<TreeNodeViewModel> roots)
     {
+        _nodeMap.Clear();
         ElementTree.RootNodes.Clear();
         foreach (var root in roots)
             ElementTree.RootNodes.Add(BuildNode(root));
     }
 
-    private static TreeViewNode BuildNode(TreeNodeViewModel vm)
+    private TreeViewNode BuildNode(TreeNodeViewModel vm)
     {
         var node = new TreeViewNode
         {
             Content = vm,
             IsExpanded = vm.IsExpanded,
         };
+        _nodeMap[vm] = node;
         foreach (var child in vm.Children)
             node.Children.Add(BuildNode(child));
         return node;
+    }
+
+    private void OnScrollIntoViewRequested(TreeNodeViewModel vm)
+    {
+        if (_nodeMap.TryGetValue(vm, out var tvNode))
+        {
+            var container = ElementTree.ContainerFromNode(tvNode) as FrameworkElement;
+            container?.StartBringIntoView();
+        }
     }
 
     private void OnItemInvoked(TreeView sender, TreeViewItemInvokedEventArgs args)
