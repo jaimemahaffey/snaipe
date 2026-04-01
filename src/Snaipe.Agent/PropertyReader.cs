@@ -506,6 +506,7 @@ public static class PropertyReader
                 Value = ctrl.Template.TargetType?.Name ?? "(set)",
                 ValueKind = "String",
                 IsReadOnly = true,
+                TemplateOriginKind = "ControlTemplate",
             });
         }
 
@@ -526,6 +527,7 @@ public static class PropertyReader
                 Value = rootType is not null ? $"Root: {rootType}" : "(set)",
                 ValueKind = "String",
                 IsReadOnly = true,
+                TemplateOriginKind = "ContentTemplate",
             });
         }
 
@@ -539,6 +541,7 @@ public static class PropertyReader
                 Value = "(set)",
                 ValueKind = "String",
                 IsReadOnly = true,
+                TemplateOriginKind = "ItemTemplate",
             });
         }
 
