@@ -117,6 +117,39 @@ public sealed class MainViewModel : ViewModelBase
     public RelayCommand<PropertyRowViewModel> DrillIntoCommand { get; }
     public RelayCommand<BreadcrumbSegment>   NavigateToBreadcrumbCommand { get; }
 
+    // ── Template jump ─────────────────────────────────────────────────────────
+    /// <summary>
+    /// Raised when the tree should scroll to bring a node into view.
+    /// ElementTreeControl.xaml.cs subscribes and calls TreeView.ScrollIntoView.
+    /// </summary>
+    public event Action<TreeNodeViewModel>? ScrollIntoViewRequested;
+
+    /// <summary>
+    /// DFS-searches the children of the currently selected node for the first
+    /// descendant whose <see cref="ElementNode.TemplateOrigin"/> matches
+    /// <paramref name="templateOriginKind"/>, then selects it.
+    /// </summary>
+    public void JumpToTemplateRoot(string templateOriginKind)
+    {
+        if (_selectedNode is null) return;
+        var found = FindTemplateRoot(_selectedNode.Children, templateOriginKind);
+        if (found is null) return;
+        SelectedNode = found;
+        ScrollIntoViewRequested?.Invoke(found);
+    }
+
+    private static TreeNodeViewModel? FindTemplateRoot(
+        IEnumerable<TreeNodeViewModel> nodes, string kind)
+    {
+        foreach (var node in nodes)
+        {
+            if (node.Node.TemplateOrigin == kind) return node;
+            var found = FindTemplateRoot(node.Children, kind);
+            if (found is not null) return found;
+        }
+        return null;
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
     private void RefreshCommandStates()
     {
@@ -286,9 +319,13 @@ public sealed class MainViewModel : ViewModelBase
                 RelayCommand? drillCmd = prop.IsObjectValued
                     ? new RelayCommand(() => DrillIntoCommand.Execute(row))
                     : null;
+                RelayCommand? jumpCmd = prop.TemplateOriginKind is { } kind
+                    ? new RelayCommand(() => JumpToTemplateRoot(kind))
+                    : null;
                 row = new PropertyRowViewModel(prop,
                     r => SetPropertyAsync(node.Node.Id, capturedPath, r.Entry.Name, r.EditValue, r),
-                    drillCmd);
+                    drillCmd,
+                    jumpCmd);
                 return row;
             }).ToList();
 

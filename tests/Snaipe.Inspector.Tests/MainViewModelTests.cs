@@ -118,4 +118,79 @@ public class MainViewModelTests
 
         Assert.Empty(vm.Breadcrumb);
     }
+
+    [Fact]
+    public void JumpToTemplateRoot_FindsDirectChild_SetsSelectedNode()
+    {
+        var vm = new MainViewModel();
+        var childNode = new Snaipe.Protocol.ElementNode
+            { Id = "2", TypeName = "Border", TemplateOrigin = "ControlTemplate" };
+        var rootNode = new Snaipe.Protocol.ElementNode { Id = "1", TypeName = "Button" };
+        var childVm = new TreeNodeViewModel(childNode);
+        var rootVm = new TreeNodeViewModel(rootNode);
+        rootVm.Children.Add(childVm);
+        vm.RootNodes.Add(rootVm);
+        vm.SelectedNode = rootVm;
+
+        vm.JumpToTemplateRoot("ControlTemplate");
+
+        Assert.Equal(childVm, vm.SelectedNode);
+    }
+
+    [Fact]
+    public void JumpToTemplateRoot_FindsDeepDescendant_SetsSelectedNode()
+    {
+        var vm = new MainViewModel();
+        var deepNode = new Snaipe.Protocol.ElementNode
+            { Id = "3", TypeName = "Grid", TemplateOrigin = "ContentTemplate" };
+        var midNode = new Snaipe.Protocol.ElementNode { Id = "2", TypeName = "Border" };
+        var rootNode = new Snaipe.Protocol.ElementNode { Id = "1", TypeName = "ContentPresenter" };
+        var deepVm = new TreeNodeViewModel(deepNode);
+        var midVm = new TreeNodeViewModel(midNode);
+        midVm.Children.Add(deepVm);
+        var rootVm = new TreeNodeViewModel(rootNode);
+        rootVm.Children.Add(midVm);
+        vm.RootNodes.Add(rootVm);
+        vm.SelectedNode = rootVm;
+
+        vm.JumpToTemplateRoot("ContentTemplate");
+
+        Assert.Equal(deepVm, vm.SelectedNode);
+    }
+
+    [Fact]
+    public void JumpToTemplateRoot_NoMatch_SelectedNodeUnchanged()
+    {
+        var vm = new MainViewModel();
+        var rootNode = new Snaipe.Protocol.ElementNode { Id = "1", TypeName = "Button" };
+        var rootVm = new TreeNodeViewModel(rootNode);
+        vm.RootNodes.Add(rootVm);
+        vm.SelectedNode = rootVm;
+
+        vm.JumpToTemplateRoot("ControlTemplate");
+
+        Assert.Equal(rootVm, vm.SelectedNode);
+    }
+
+    [Fact]
+    public void JumpToTemplateRoot_MultipleMatches_SelectsFirstDfsMatch()
+    {
+        var vm = new MainViewModel();
+        var firstNode = new Snaipe.Protocol.ElementNode
+            { Id = "2", TypeName = "Border", TemplateOrigin = "ItemTemplate" };
+        var secondNode = new Snaipe.Protocol.ElementNode
+            { Id = "3", TypeName = "Grid", TemplateOrigin = "ItemTemplate" };
+        var rootNode = new Snaipe.Protocol.ElementNode { Id = "1", TypeName = "ListView" };
+        var firstVm = new TreeNodeViewModel(firstNode);
+        var secondVm = new TreeNodeViewModel(secondNode);
+        var rootVm = new TreeNodeViewModel(rootNode);
+        rootVm.Children.Add(firstVm);
+        rootVm.Children.Add(secondVm);
+        vm.RootNodes.Add(rootVm);
+        vm.SelectedNode = rootVm;
+
+        vm.JumpToTemplateRoot("ItemTemplate");
+
+        Assert.Equal(firstVm, vm.SelectedNode);
+    }
 }
