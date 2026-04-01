@@ -11,6 +11,18 @@ public sealed class ElementNode
     public List<PropertyEntry> Properties { get; init; } = [];
     public List<ElementNode> Children { get; init; } = [];
     public BoundsInfo? Bounds { get; init; }
+
+    /// <summary>
+    /// Set when this element is the root of an instantiated template.
+    /// Values: "ControlTemplate" | "ContentTemplate" | "ItemTemplate"
+    /// </summary>
+    public string? TemplateOrigin { get; init; }
+
+    /// <summary>
+    /// For ItemTemplate roots: number of realized item containers currently in the visual tree.
+    /// Null for all other template kinds.
+    /// </summary>
+    public int? TemplateInstanceCount { get; init; }
 }
 
 public sealed class BoundsInfo
@@ -43,4 +55,11 @@ public sealed class PropertyEntry
     /// Inspector renders a drill-down chevron for these rows.
     /// </summary>
     public bool IsObjectValued { get; init; }
+    /// <summary>
+    /// When set, this property row is a template navigation target.
+    /// The Inspector renders a jump arrow and on click performs a client-side
+    /// DFS search for a descendant node with matching TemplateOrigin.
+    /// Values: "ControlTemplate" | "ContentTemplate" | "ItemTemplate"
+    /// </summary>
+    public string? TemplateOriginKind { get; init; }
 }
