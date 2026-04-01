@@ -86,6 +86,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Breadcrumb row — visible when drilled into a nested object -->
@@ -200,6 +201,10 @@
                             <StackPanel Orientation="Horizontal"
                                         HorizontalAlignment="Right"
                                         VerticalAlignment="Center">
+                                <Button Content="?"
+                                        Visibility="{x:Bind ShowValueChainVisibility}"
+                                        Command="{x:Bind ShowValueChainCommand}"
+                                        Style="{StaticResource ChevronButtonStyle}"/>
                                 <Button Content="↗"
                                         Visibility="{x:Bind JumpToTemplateVisibility}"
                                         Command="{x:Bind JumpToTemplateCommand}"
@@ -238,6 +243,105 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+
+        <!-- Value chain panel — visible when a ? button is active -->
+        <Grid Grid.Row="4"
+              Visibility="{x:Bind ViewModel.ValueChainPanelVisibility, Mode=OneWay}"
+              BorderBrush="#2563EB"
+              BorderThickness="0,2,0,0"
+              Background="#0F172A"
+              Padding="12,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Panel header: property name + close button -->
+            <Grid Grid.Row="0" Margin="0,0,0,8">
+                <TextBlock Text="{x:Bind ViewModel.ValueChainPropertyName, Mode=OneWay}"
+                           FontSize="11"
+                           FontWeight="SemiBold"
+                           Foreground="#60A5FA"
+                           VerticalAlignment="Center"/>
+                <Button Content="✕"
+                        HorizontalAlignment="Right"
+                        Command="{x:Bind ViewModel.ClearValueChainCommand}"
+                        Style="{StaticResource ChevronButtonStyle}"/>
+            </Grid>
+
+            <!-- Chain entries list -->
+            <ItemsControl Grid.Row="1"
+                          ItemsSource="{x:Bind ViewModel.ActiveValueChain, Mode=OneWay}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ValueChainEntryViewModel">
+                        <Grid Margin="0,2">
+
+                            <!-- Winner row: green left border, blue tint background, "wins" badge -->
+                            <Border Background="#1E3A5F"
+                                    CornerRadius="4"
+                                    BorderBrush="#22C55E"
+                                    BorderThickness="3,0,0,0"
+                                    Padding="8,5"
+                                    Visibility="{x:Bind WinnerBadgeVisibility}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal"
+                                                VerticalAlignment="Center"
+                                                Spacing="4">
+                                        <TextBlock Text="{x:Bind Source}"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#22C55E"/>
+                                        <Border Background="#14532D"
+                                                CornerRadius="3"
+                                                Padding="3,1">
+                                            <TextBlock Text="wins"
+                                                       FontSize="9"
+                                                       Foreground="#86EFAC"/>
+                                        </Border>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{x:Bind Value}"
+                                               FontSize="11"
+                                               Foreground="#4ADE80"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Overridden row: grey left border, dimmed, strikethrough value -->
+                            <Border Background="#1F2937"
+                                    CornerRadius="4"
+                                    BorderBrush="#374151"
+                                    BorderThickness="3,0,0,0"
+                                    Padding="8,5"
+                                    Opacity="0.6"
+                                    Visibility="{x:Bind OverriddenVisibility}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{x:Bind Source}"
+                                               FontSize="10"
+                                               Foreground="#9CA3AF"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{x:Bind Value}"
+                                               FontSize="11"
+                                               Foreground="#9CA3AF"
+                                               TextDecorations="Strikethrough"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
 
     </Grid>
 </UserControl>
