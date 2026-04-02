@@ -1,0 +1,8 @@
+<!-- stub — replaced in Task 13 -->
+<ContentDialog
+    x:Class="Snaipe.SampleApp.Dialogs.ExportDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Export">
+    <Grid/>
+</ContentDialog>

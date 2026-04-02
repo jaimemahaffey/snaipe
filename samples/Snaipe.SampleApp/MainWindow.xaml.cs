@@ -1,20 +1,13 @@
-// samples/Snaipe.SampleApp/MainWindow.xaml.cs
+// stub — replaced in Task 11
 using Microsoft.UI.Xaml;
 
 namespace Snaipe.SampleApp;
 
 public sealed partial class MainWindow : Window
 {
-    private readonly SampleViewModel _viewModel = new();
-
     public MainWindow()
     {
         InitializeComponent();
-        // Window has no DataContext property in WinUI/Uno -- set on root content.
-        if (Content is FrameworkElement root)
-            root.DataContext = _viewModel;
-        Title = "Snaipe Sample App";
+        Title = "ASCII Studio";
     }
-
-    public SampleViewModel ViewModel => _viewModel;
 }
