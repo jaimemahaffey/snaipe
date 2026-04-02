@@ -103,6 +103,7 @@ public sealed class HighlightOverlay : IDisposable
             IsHitTestVisible = false,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             VerticalAlignment = VerticalAlignment.Stretch,
+            Tag = "SnaipeOverlay",
         };
 
         // Create the highlight rectangle.
