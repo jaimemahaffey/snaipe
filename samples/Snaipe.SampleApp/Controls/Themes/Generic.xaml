@@ -34,4 +34,68 @@
         </Setter>
     </Style>
 
+
+    <!-- ══ ToolbarButton ══════════════════════════════════════════════ -->
+    <Style TargetType="local:ToolbarButton">
+        <Setter Property="Width" Value="64"/>
+        <Setter Property="Padding" Value="6,8"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:ToolbarButton">
+                    <Border x:Name="RootBorder"
+                            CornerRadius="4"
+                            Padding="{TemplateBinding Padding}"
+                            Background="Transparent">
+
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="PointerOver">
+                                    <VisualState.Setters>
+                                        <Setter Target="RootBorder.Background" Value="#1E3A5F"/>
+                                        <Setter Target="IconText.Foreground" Value="#93C5FD"/>
+                                        <Setter Target="LabelText.Foreground" Value="#93C5FD"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <VisualState.Setters>
+                                        <Setter Target="RootBorder.Background" Value="#1E40AF"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <VisualState.Setters>
+                                        <Setter Target="RootBorder.Opacity" Value="0.35"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="ActiveStates">
+                                <VisualState x:Name="Inactive"/>
+                                <VisualState x:Name="Active">
+                                    <VisualState.Setters>
+                                        <Setter Target="RootBorder.Background" Value="#1E40AF"/>
+                                        <Setter Target="IconText.Foreground" Value="White"/>
+                                        <Setter Target="LabelText.Foreground" Value="White"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+
+                        <StackPanel HorizontalAlignment="Center" Spacing="3">
+                            <TextBlock x:Name="IconText"
+                                       Text="{TemplateBinding Icon}"
+                                       FontSize="18"
+                                       HorizontalAlignment="Center"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
+                            <TextBlock x:Name="LabelText"
+                                       Text="{TemplateBinding Label}"
+                                       FontSize="10"
+                                       HorizontalAlignment="Center"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
