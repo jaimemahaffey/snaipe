@@ -16,5 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Snaipe.Agent\Snaipe.Agent.csproj" />
+    <ProjectReference Include="..\..\src\Snaipe.Protocol\Snaipe.Protocol.csproj" />
   </ItemGroup>
 </Project>
