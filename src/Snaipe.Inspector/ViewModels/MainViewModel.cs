@@ -17,6 +17,16 @@ public sealed class MainViewModel : ViewModelBase
     private string _connectButtonLabel = "Connect";
     private CancellationTokenSource? _propertiesCts;
 
+    // Captured on the UI thread at construction time.
+    // Null in test contexts — OnAgentEventReceived runs the action inline when null.
+    private readonly Microsoft.UI.Dispatching.DispatcherQueue? _dispatcherQueue = GetDispatcherQueueSafe();
+
+    private static Microsoft.UI.Dispatching.DispatcherQueue? GetDispatcherQueueSafe()
+    {
+        try { return Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread(); }
+        catch { return null; }
+    }
+
     public MainViewModel()
     {
         ConnectCommand = new AsyncRelayCommand(
@@ -163,6 +173,7 @@ public sealed class MainViewModel : ViewModelBase
     private void ClearSession()
     {
         _propertiesCts?.Cancel();
+        _client.EventReceived -= OnAgentEventReceived;
         RootNodes.Clear();
         PropertyGrid.Clear();
         Breadcrumb.Clear();
@@ -197,7 +208,7 @@ public sealed class MainViewModel : ViewModelBase
 
     private static TreeNodeViewModel BuildTreeNode(ElementNode node, HashSet<string> expandedIds)
     {
-        var vm = new TreeNodeViewModel(node) { IsExpanded = true };
+        var vm = new TreeNodeViewModel(node) { IsExpanded = expandedIds.Contains(node.Id) };
         foreach (var child in node.Children)
             vm.Children.Add(BuildTreeNode(child, expandedIds));
         return vm;
@@ -211,7 +222,7 @@ public sealed class MainViewModel : ViewModelBase
         return count;
     }
 
-    // ── Command implementations (IPC calls added in Tasks 5 & 6) ─────────────
+    // ── Command implementations ───────────────────────────────────────────────
     private void RefreshAgents()
     {
         var agents = AgentDiscoveryScanner.Scan();
@@ -237,6 +248,9 @@ public sealed class MainViewModel : ViewModelBase
         try
         {
             await _client.ConnectAsync(_selectedAgent.PipeName);
+            _client.EventReceived += OnAgentEventReceived;
+            await _client.ConnectEventsAsync(_selectedAgent.EventsPipeName);
+
             _state = ConnectionState.Connected;
             StatusMessage = $"Connected to {_selectedAgent.DisplayName}";
             RefreshCommandStates();
@@ -249,6 +263,7 @@ public sealed class MainViewModel : ViewModelBase
             RefreshCommandStates();
         }
     }
+
     private void Disconnect()
     {
         _client.Disconnect();
@@ -257,6 +272,7 @@ public sealed class MainViewModel : ViewModelBase
         ClearSession();
         RefreshCommandStates();
     }
+
     private async Task FetchTreeAsync()
     {
         try
@@ -268,8 +284,11 @@ public sealed class MainViewModel : ViewModelBase
                 new GetTreeRequest { MessageId = Guid.NewGuid().ToString("N") });
 
             RootNodes.Clear();
-            RootNodes.Add(BuildTreeNode(response.Root, expandedIds));
-            StatusMessage = $"Tree loaded ({CountNodes(response.Root)} elements).";
+            foreach (var root in response.Roots)
+                RootNodes.Add(BuildTreeNode(root, expandedIds));
+
+            var totalCount = response.Roots.Sum(CountNodes);
+            StatusMessage = $"Tree loaded ({totalCount} elements).";
         }
         catch (IOException ex)
         {
@@ -280,6 +299,7 @@ public sealed class MainViewModel : ViewModelBase
             StatusMessage = $"Tree error: {ex.Message}";
         }
     }
+
     private async Task OnSelectedNodeChangedAsync(TreeNodeViewModel? node)
     {
         Breadcrumb.Clear();
@@ -412,5 +432,59 @@ public sealed class MainViewModel : ViewModelBase
         {
             // Best effort — highlight failures are non-fatal.
         }
+    }
+
+    /// <summary>
+    /// Called by InspectorIpcClient.EventReceived on a background thread.
+    /// Must marshal all UI state changes to the UI thread.
+    /// Marked internal so MainViewModelPickTests can call it directly.
+    /// </summary>
+    internal void OnAgentEventReceived(InspectorMessage msg)
+    {
+        void Apply()
+        {
+            switch (msg)
+            {
+                case ElementUnderCursorEvent e:
+                    SelectNodeById(e.ElementId);
+                    StatusMessage = $"Picking: {e.TypeName}";
+                    break;
+
+                case PickModeActiveEvent e when e.Active:
+                    StatusMessage = "Pick mode active — Ctrl+Shift + hover to select";
+                    break;
+
+                case PickModeActiveEvent:
+                    StatusMessage = _state == ConnectionState.Connected && _selectedAgent is not null
+                        ? $"Connected to {_selectedAgent.DisplayName}"
+                        : StatusMessage; // keep existing message if disconnected
+                    break;
+            }
+        }
+
+        if (_dispatcherQueue is not null)
+            _dispatcherQueue.TryEnqueue(Apply);
+        else
+            Apply(); // test context — already on correct thread
+    }
+
+    private void SelectNodeById(string elementId)
+    {
+        var node = FindNodeById(RootNodes, elementId);
+        if (node is null) return;
+        SelectedNode = node;
+        ScrollIntoViewRequested?.Invoke(node);
+    }
+
+    private static TreeNodeViewModel? FindNodeById(
+        IEnumerable<TreeNodeViewModel> nodes, string id)
+    {
+        foreach (var node in nodes)
+        {
+            if (node.Node.Id == id) return node;
+            var found = FindNodeById(node.Children, id);
+            if (found is not null) return found;
+        }
+        return null;
     }
 }

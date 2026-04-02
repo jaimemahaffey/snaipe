@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFrameworks>net9.0;net9.0-windows</TargetFrameworks>
     <RootNamespace>Snaipe.Agent</RootNamespace>
     <Description>In-process agent that walks the Uno visual tree and serves data to the inspector</Description>
   </PropertyGroup>
