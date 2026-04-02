@@ -42,6 +42,7 @@ public sealed class AgentDiscovery : IDisposable
                 : "Unknown",
             windowTitle,
             pipeName,
+            eventsPipeName = $"{pipeName}-events",
             protocolVersion = Protocol.MessageFraming.ProtocolVersion,
             agentVersion = "0.1.0",
             startedAt = DateTime.UtcNow.ToString("O"),

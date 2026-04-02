@@ -52,6 +52,9 @@ public static class AgentDiscoveryScanner
                 var processName = root.GetProperty("processName").GetString() ?? "Unknown";
                 var windowTitle = root.GetProperty("windowTitle").GetString() ?? "";
                 var pipeName = root.GetProperty("pipeName").GetString() ?? "";
+                var eventsPipeName = root.TryGetProperty("eventsPipeName", out var ep)
+                    ? ep.GetString() ?? $"{pipeName}-events"
+                    : $"{pipeName}-events";
                 var protocolVersion = root.GetProperty("protocolVersion").GetString() ?? "0.0";
                 var agentVersion = root.TryGetProperty("agentVersion", out var av) ? av.GetString() : null;
 
@@ -61,6 +64,7 @@ public static class AgentDiscoveryScanner
                     ProcessName = processName,
                     WindowTitle = windowTitle,
                     PipeName = pipeName,
+                    EventsPipeName = eventsPipeName,
                     ProtocolVersion = protocolVersion,
                     AgentVersion = agentVersion,
                     FilePath = file,
@@ -98,6 +102,7 @@ public class AgentInfo
     public required string ProcessName { get; init; }
     public required string WindowTitle { get; init; }
     public required string PipeName { get; init; }
+    public required string EventsPipeName { get; init; }
     public required string ProtocolVersion { get; init; }
     public string? AgentVersion { get; init; }
     public string? FilePath { get; init; }
