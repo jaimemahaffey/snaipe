@@ -1573,7 +1573,7 @@ git commit -m "feat(sample): add ConversionPipeline with ImageSharp, Floyd-Stein
 - Create: `samples/Snaipe.SampleApp/ViewModels/ExportViewModel.cs`
 - Create: `samples/Snaipe.SampleApp/ViewModels/ShellViewModel.cs`
 
-- [ ] **Step 1: Create ImagePanelViewModel.cs**
+- [x] **Step 1: Create ImagePanelViewModel.cs**
 
 ```csharp
 // samples/Snaipe.SampleApp/ViewModels/ImagePanelViewModel.cs
@@ -1614,7 +1614,7 @@ public sealed class ImagePanelViewModel : ViewModelBase
 }
 ```
 
-- [ ] **Step 2: Create AsciiOutputViewModel.cs**
+- [x] **Step 2: Create AsciiOutputViewModel.cs**
 
 ```csharp
 // samples/Snaipe.SampleApp/ViewModels/AsciiOutputViewModel.cs
@@ -1647,7 +1647,7 @@ public sealed class AsciiOutputViewModel : ViewModelBase
 }
 ```
 
-- [ ] **Step 3: Create ConversionSettingsViewModel.cs**
+- [x] **Step 3: Create ConversionSettingsViewModel.cs**
 
 ```csharp
 // samples/Snaipe.SampleApp/ViewModels/ConversionSettingsViewModel.cs
@@ -1696,7 +1696,7 @@ public sealed class ConversionSettingsViewModel : ViewModelBase
 }
 ```
 
-- [ ] **Step 4: Create ExportViewModel.cs**
+- [x] **Step 4: Create ExportViewModel.cs**
 
 ```csharp
 // samples/Snaipe.SampleApp/ViewModels/ExportViewModel.cs
@@ -1800,7 +1800,7 @@ public sealed class ExportViewModel : ViewModelBase
 > ```
 > Then replace all `System.Web.HttpUtility.HtmlEncode(...)` calls with `HtmlEncode(...)`.
 
-- [ ] **Step 5: Create ShellViewModel.cs**
+- [x] **Step 5: Create ShellViewModel.cs**
 
 ```csharp
 // samples/Snaipe.SampleApp/ViewModels/ShellViewModel.cs
@@ -1952,7 +1952,7 @@ public sealed class ShellViewModel : ViewModelBase, IDisposable
 }
 ```
 
-- [ ] **Step 6: Build to verify**
+- [x] **Step 6: Build to verify**
 
 ```bash
 dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows -v quiet
@@ -1960,7 +1960,7 @@ dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows 
 
 Expected: succeeds. If `System.Web.HttpUtility` fails, apply the `HtmlEncode` inline helper described in the ExportViewModel note above.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add samples/Snaipe.SampleApp/ViewModels/
