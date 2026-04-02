@@ -181,4 +181,63 @@
         </Setter>
     </Style>
 
+
+    <!-- ══ CharacterSetPicker ════════════════════════════════════════ -->
+    <Style TargetType="local:CharacterSetPicker">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:CharacterSetPicker">
+                    <Border CornerRadius="4"
+                            BorderBrush="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="1">
+                        <Grid x:Name="PART_Grid">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <ToggleButton x:Name="PART_BlockButton"
+                                          Grid.Column="0"
+                                          HorizontalAlignment="Stretch"
+                                          HorizontalContentAlignment="Center"
+                                          CornerRadius="3,0,0,3"
+                                          Padding="6,4"
+                                          FontSize="11"
+                                          Content="Block"/>
+
+                            <ToggleButton x:Name="PART_ClassicButton"
+                                          Grid.Column="1"
+                                          HorizontalAlignment="Stretch"
+                                          HorizontalContentAlignment="Center"
+                                          CornerRadius="0"
+                                          Padding="6,4"
+                                          FontSize="11"
+                                          Content="Classic"/>
+
+                            <ToggleButton x:Name="PART_BrailleButton"
+                                          Grid.Column="2"
+                                          HorizontalAlignment="Stretch"
+                                          HorizontalContentAlignment="Center"
+                                          CornerRadius="0"
+                                          Padding="6,4"
+                                          FontSize="11"
+                                          Content="Braille"/>
+
+                            <ToggleButton x:Name="PART_MinimalButton"
+                                          Grid.Column="3"
+                                          HorizontalAlignment="Stretch"
+                                          HorizontalContentAlignment="Center"
+                                          CornerRadius="0,3,3,0"
+                                          Padding="6,4"
+                                          FontSize="11"
+                                          Content="Minimal"/>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
