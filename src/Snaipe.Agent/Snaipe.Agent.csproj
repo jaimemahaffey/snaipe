@@ -38,7 +38,7 @@
       <Output TaskParameter="NuGetShortFolderName" PropertyName="_BundleProtocolLibFolder" />
     </GetNuGetShortFolderName>
     <ItemGroup>
-      <TfmSpecificPackageFile Include="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'Snaipe.Protocol'">
+      <TfmSpecificPackageFile Include="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'Snaipe.Protocol' and '%(Extension)' == '.dll'">
         <PackagePath>lib/$(_BundleProtocolLibFolder)</PackagePath>
       </TfmSpecificPackageFile>
     </ItemGroup>
