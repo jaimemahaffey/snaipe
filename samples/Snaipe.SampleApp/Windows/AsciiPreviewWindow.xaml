@@ -1,7 +1,40 @@
-<!-- stub — replaced in Task 12 -->
+<!-- samples/Snaipe.SampleApp/Windows/AsciiPreviewWindow.xaml -->
 <Window
     x:Class="Snaipe.SampleApp.Windows.AsciiPreviewWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid/>
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Snaipe.SampleApp.Controls">
+
+    <Grid Background="#020617">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <controls:AsciiOutputControl x:Name="PreviewOutput"
+                                     Grid.Row="0"/>
+
+        <Border Grid.Row="1"
+                Background="#0F172A"
+                Padding="12,4"
+                BorderThickness="0,1,0,0"
+                BorderBrush="#1E293B">
+            <StackPanel Orientation="Horizontal" Spacing="16">
+                <TextBlock x:Name="InfoText"
+                           FontSize="11"
+                           Foreground="#64748B"
+                           FontFamily="Cascadia Code, Consolas, monospace"
+                           VerticalAlignment="Center"/>
+                <Slider x:Name="FontSizeSlider"
+                        Minimum="6" Maximum="24" StepFrequency="1"
+                        Width="120"
+                        VerticalAlignment="Center"
+                        ToolTipService.ToolTip="Font size"/>
+                <TextBlock Text="Font size"
+                           FontSize="11"
+                           Foreground="#64748B"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
 </Window>

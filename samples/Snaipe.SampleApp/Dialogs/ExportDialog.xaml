@@ -1,8 +1,49 @@
-<!-- stub — replaced in Task 13 -->
+<!-- samples/Snaipe.SampleApp/Dialogs/ExportDialog.xaml -->
 <ContentDialog
     x:Class="Snaipe.SampleApp.Dialogs.ExportDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Export">
-    <Grid/>
+    xmlns:vm="using:Snaipe.SampleApp.ViewModels"
+    Title="Export ASCII Art"
+    PrimaryButtonText="Export"
+    CloseButtonText="Cancel"
+    DefaultButton="Primary">
+
+    <StackPanel Spacing="16" Width="400">
+        <StackPanel Spacing="8">
+            <TextBlock Text="Format" FontSize="12" Foreground="#64748B"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <RadioButton Content="Plain Text"
+                             IsChecked="True"
+                             GroupName="Format"/>
+                <RadioButton Grid.Column="1"
+                             Content="HTML (Color)"
+                             GroupName="Format"/>
+                <RadioButton Grid.Column="2"
+                             Content="Clipboard"
+                             GroupName="Format"/>
+            </Grid>
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <TextBlock Text="Destination" FontSize="12" Foreground="#64748B"/>
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="PathBox"
+                         PlaceholderText="Select a file..."
+                         IsReadOnly="True"/>
+                <Button Grid.Column="1"
+                        Content="Browse"
+                        Click="OnBrowseClicked"/>
+            </Grid>
+        </StackPanel>
+    </StackPanel>
 </ContentDialog>

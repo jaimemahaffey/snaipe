@@ -1,12 +1,128 @@
-<!-- stub — replaced in Task 11 -->
+<!-- samples/Snaipe.SampleApp/MainWindow.xaml -->
 <Window
     x:Class="Snaipe.SampleApp.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Snaipe.SampleApp.Controls"
+    xmlns:vm="using:Snaipe.SampleApp.ViewModels">
+
     <Grid Background="#0D1117">
-        <TextBlock Text="ASCII Studio — loading…"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Foreground="#64748B"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ── Left toolbar ──────────────────────────────────────────── -->
+        <Border Grid.Row="0" Grid.Column="0"
+                Background="#111827"
+                Padding="8"
+                BorderThickness="0,0,1,0"
+                BorderBrush="#1E293B">
+            <StackPanel Spacing="12">
+                <controls:ToolbarButton Icon="📂" Label="Open"
+                                        PointerPressed="OnOpenClicked"/>
+                <controls:ToolbarButton Icon="⚡" Label="Convert"
+                                        IsActive="True"
+                                        PointerPressed="OnConvertClicked"/>
+                <controls:ToolbarButton Icon="💾" Label="Export"
+                                        PointerPressed="OnExportClicked"/>
+                <controls:ToolbarButton Icon="📋" Label="Copy"
+                                        PointerPressed="OnCopyClicked"/>
+                <Border Height="1" Background="#1E293B" Margin="8,4"/>
+                <controls:ToolbarButton Icon="🔲" Label="Grid"
+                                        PointerPressed="OnToggleGridClicked"/>
+                <controls:ToolbarButton Icon="📺" Label="Preview"
+                                        PointerPressed="OnTogglePreviewClicked"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ── Main content area ──────────────────────────────────────── -->
+        <controls:SplitPanel Grid.Row="0" Grid.Column="1"
+                             x:Name="MainSplit"
+                             Pane1MinSize="200"
+                             Pane2MinSize="200">
+            <controls:SplitPanel.Pane1Content>
+                <Grid>
+                    <controls:ImagePreviewControl x:Name="ImagePreview"
+                                                  Source="{Binding ImagePanel.SourceImage}"
+                                                  ZoomLevel="{Binding ImagePanel.ZoomLevel, Mode=TwoWay}"/>
+                </Grid>
+            </controls:SplitPanel.Pane1Content>
+            <controls:SplitPanel.Pane2Content>
+                <Grid>
+                    <controls:AsciiOutputControl x:Name="AsciiOutput"
+                                                 Document="{Binding AsciiOutput.Document}"
+                                                 Status="{Binding AsciiOutput.DisplayStatus}"
+                                                 ProgressPercent="{Binding AsciiOutput.ProgressPercent}"
+                                                 ErrorMessage="{Binding AsciiOutput.ErrorMessage}"
+                                                 OutputFontSize="{Binding AsciiOutput.OutputFontSize}"/>
+                </Grid>
+            </controls:SplitPanel.Pane2Content>
+        </controls:SplitPanel>
+
+        <!-- ── Bottom status bar ─────────────────────────────────────── -->
+        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                Background="#0F172A"
+                Padding="12,4"
+                BorderThickness="0,1,0,0"
+                BorderBrush="#1E293B">
+            <Grid>
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <TextBlock Text="{Binding StatusMessage}"
+                               FontSize="11"
+                               Foreground="#94A3B8"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Spacing="12">
+                    <controls:CharacterSetPicker x:Name="CharPicker"
+                                                 VerticalAlignment="Center"
+                                                 SelectedCharacterSet="{Binding Settings.CharacterSet, Mode=TwoWay}"/>
+                    <Slider x:Name="WidthSlider"
+                            Width="100"
+                            Minimum="20" Maximum="300" StepFrequency="1"
+                            Value="{Binding Settings.OutputWidth, Mode=TwoWay}"
+                            VerticalAlignment="Center"/>
+                    <TextBlock Text="Width"
+                               FontSize="11"
+                               Foreground="#64748B"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ── Floating Settings Panel (for Snaipe interaction) ────────── -->
+        <Border x:Name="SettingsFlyout"
+                Grid.Row="0" Grid.Column="1"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="16"
+                Width="220"
+                Background="#F01E293B"
+                BorderBrush="#334155"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="16"
+                Visibility="Collapsed">
+            <StackPanel Spacing="12">
+                <TextBlock Text="Settings" FontWeight="Bold" Foreground="White"/>
+                <ToggleSwitch Header="Invert colors"
+                             IsOn="{Binding Settings.Invert, Mode=TwoWay}"/>
+                <ComboBox Header="Color Mode"
+                          HorizontalAlignment="Stretch"
+                          ItemsSource="{Binding ColorModes}"
+                          SelectedItem="{Binding Settings.ColorMode, Mode=TwoWay}"/>
+                <ComboBox Header="Dithering"
+                          HorizontalAlignment="Stretch"
+                          ItemsSource="{Binding DitheringAlgs}"
+                          SelectedItem="{Binding Settings.Dithering, Mode=TwoWay}"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

@@ -1,13 +1,81 @@
-// stub — replaced in Task 11
+// samples/Snaipe.SampleApp/MainWindow.xaml.cs
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Input;
+using Snaipe.SampleApp.ViewModels;
+using Snaipe.SampleApp.Windows;
+using Snaipe.SampleApp.Dialogs;
 
 namespace Snaipe.SampleApp;
 
 public sealed partial class MainWindow : Window
 {
+    private readonly ShellViewModel _vm;
+    private AsciiPreviewWindow? _previewWindow;
+
     public MainWindow()
     {
         InitializeComponent();
         Title = "ASCII Studio";
+
+        _vm = new ShellViewModel(DispatcherQueue);
+        Content.DataContext = _vm;
+
+        // Wire up VM requests
+        _vm.RequestOpenPreviewWindow  = OpenPreviewWindow;
+        _vm.RequestClosePreviewWindow = ClosePreviewWindow;
+        _vm.RequestShowExportDialog   = ShowExportDialog;
+
+        Closed += (_, _) =>
+        {
+            _previewWindow?.Close();
+            _vm.Dispose();
+        };
+    }
+
+    private void OnOpenClicked(object sender, PointerRoutedEventArgs e)
+        => _ = _vm.OpenImageCommand.ExecuteAsync();
+
+    private void OnConvertClicked(object sender, PointerRoutedEventArgs e)
+        => _ = _vm.ConvertCommand.ExecuteAsync();
+
+    private void OnExportClicked(object sender, PointerRoutedEventArgs e)
+        => _vm.ShowExportDialogCommand.Execute(null);
+
+    private void OnCopyClicked(object sender, PointerRoutedEventArgs e)
+        => _vm.CopyToClipboardCommand.Execute(null);
+
+    private void OnToggleGridClicked(object sender, PointerRoutedEventArgs e)
+    {
+        SettingsFlyout.Visibility = SettingsFlyout.Visibility == Visibility.Visible
+            ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private void OnTogglePreviewClicked(object sender, PointerRoutedEventArgs e)
+        => _vm.TogglePreviewWindowCommand.Execute(null);
+
+    private void OpenPreviewWindow()
+    {
+        if (_previewWindow is not null) return;
+        _previewWindow = new AsciiPreviewWindow(_vm.AsciiOutput);
+        _previewWindow.Closed += (_, _) =>
+        {
+            _previewWindow = null;
+            _vm.NotifyPreviewWindowClosed();
+        };
+        _previewWindow.Activate();
+        _vm.NotifyPreviewWindowOpened();
+    }
+
+    private void ClosePreviewWindow()
+    {
+        _previewWindow?.Close();
+        _previewWindow = null;
+    }
+
+    private async void ShowExportDialog()
+    {
+        var dialog = new ExportDialog(_vm.Export);
+        dialog.XamlRoot = this.Content.XamlRoot;
+        await dialog.ShowAsync();
     }
 }
