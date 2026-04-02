@@ -34,7 +34,7 @@
 **Files:**
 - Modify: `src/Snaipe.Protocol/ElementNode.cs`
 
-- [ ] **Step 1: Add `ValueChainEntry` class and `ValueChain` property to `PropertyEntry`**
+- [x] **Step 1: Add `ValueChainEntry` class and `ValueChain` property to `PropertyEntry`**
 
 Replace the full contents of `src/Snaipe.Protocol/ElementNode.cs` with:
 
@@ -131,7 +131,7 @@ public sealed class ValueChainEntry
 }
 ```
 
-- [ ] **Step 2: Build to verify no errors**
+- [x] **Step 2: Build to verify no errors**
 
 ```bash
 dotnet build src/Snaipe.Protocol/Snaipe.Protocol.csproj -v quiet
@@ -139,7 +139,7 @@ dotnet build src/Snaipe.Protocol/Snaipe.Protocol.csproj -v quiet
 
 Expected: Build succeeded, 0 error(s).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/Snaipe.Protocol/ElementNode.cs
@@ -153,7 +153,7 @@ git commit -m "feat: add ValueChainEntry type and PropertyEntry.ValueChain to pr
 **Files:**
 - Modify: `src/Snaipe.Agent/PropertyReader.cs`
 
-- [ ] **Step 1: Add `TryGetActiveVisualStateSetter`, `TryGetStyleSetter`, and `BuildValueChain` helpers to PropertyReader**
+- [x] **Step 1: Add `TryGetActiveVisualStateSetter`, `TryGetStyleSetter`, and `BuildValueChain` helpers to PropertyReader**
 
 Add these three private static methods to `PropertyReader` (before the closing `}` of the class, after the existing `FindDependencyPropertyName` method):
 
@@ -285,7 +285,7 @@ Add these three private static methods to `PropertyReader` (before the closing `
     }
 ```
 
-- [ ] **Step 2: Wire `BuildValueChain` into the main DP loop in `GetProperties`**
+- [x] **Step 2: Wire `BuildValueChain` into the main DP loop in `GetProperties`**
 
 In `PropertyReader.GetProperties`, find the `entries.Add(new Protocol.PropertyEntry { ... })` inside the `foreach (var dpInfo in props)` loop. Replace it with a version that includes `ValueChain`:
 
@@ -306,7 +306,7 @@ In `PropertyReader.GetProperties`, find the `entries.Add(new Protocol.PropertyEn
                 });
 ```
 
-- [ ] **Step 3: Build Agent project**
+- [x] **Step 3: Build Agent project**
 
 ```bash
 dotnet build src/Snaipe.Agent/Snaipe.Agent.csproj -v quiet
@@ -314,7 +314,7 @@ dotnet build src/Snaipe.Agent/Snaipe.Agent.csproj -v quiet
 
 Expected: Build succeeded, 0 error(s).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/Snaipe.Agent/PropertyReader.cs
@@ -329,7 +329,7 @@ git commit -m "feat: add BuildValueChain to PropertyReader; populate PropertyEnt
 - Create: `src/Snaipe.Inspector/ViewModels/ValueChainEntryViewModel.cs`
 - Create: `tests/Snaipe.Inspector.Tests/ValueChainEntryViewModelTests.cs`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `tests/Snaipe.Inspector.Tests/ValueChainEntryViewModelTests.cs`:
 
@@ -376,7 +376,7 @@ public class ValueChainEntryViewModelTests
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~ValueChainEntryViewModel" 2>&1 | tail -8
@@ -384,7 +384,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: compile errors — `ValueChainEntryViewModel` does not exist.
 
-- [ ] **Step 3: Create ValueChainEntryViewModel**
+- [x] **Step 3: Create ValueChainEntryViewModel**
 
 Create `src/Snaipe.Inspector/ViewModels/ValueChainEntryViewModel.cs`:
 
@@ -417,7 +417,7 @@ public sealed class ValueChainEntryViewModel
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~ValueChainEntryViewModel" 2>&1 | tail -6
@@ -425,7 +425,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: Passed! — Failed: 0, Passed: 3.
 
-- [ ] **Step 5: Run full Inspector test suite**
+- [x] **Step 5: Run full Inspector test suite**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows 2>&1 | tail -5
@@ -433,7 +433,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: All tests PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/Snaipe.Inspector/ViewModels/ValueChainEntryViewModel.cs tests/Snaipe.Inspector.Tests/ValueChainEntryViewModelTests.cs
@@ -448,7 +448,7 @@ git commit -m "feat: add ValueChainEntryViewModel with WinnerBadgeVisibility / O
 - Modify: `src/Snaipe.Inspector/ViewModels/PropertyRowViewModel.cs`
 - Modify: `tests/Snaipe.Inspector.Tests/PropertyRowViewModelTests.cs`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append these two test methods to `tests/Snaipe.Inspector.Tests/PropertyRowViewModelTests.cs` (inside the class, before the closing `}`):
 
@@ -480,7 +480,7 @@ Append these two test methods to `tests/Snaipe.Inspector.Tests/PropertyRowViewMo
     }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~ShowValueChainVisibility" 2>&1 | tail -8
@@ -488,7 +488,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: compile errors — `ShowValueChainVisibility` does not exist.
 
-- [ ] **Step 3: Add ValueChain, ShowValueChainCommand, ShowValueChainVisibility to PropertyRowViewModel**
+- [x] **Step 3: Add ValueChain, ShowValueChainCommand, ShowValueChainVisibility to PropertyRowViewModel**
 
 In `src/Snaipe.Inspector/ViewModels/PropertyRowViewModel.cs`:
 
@@ -534,7 +534,7 @@ In `src/Snaipe.Inspector/ViewModels/PropertyRowViewModel.cs`:
             : Microsoft.UI.Xaml.Visibility.Collapsed;
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~ShowValueChainVisibility" 2>&1 | tail -6
@@ -542,7 +542,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: Passed! — Failed: 0, Passed: 2.
 
-- [ ] **Step 5: Run full Inspector test suite**
+- [x] **Step 5: Run full Inspector test suite**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows 2>&1 | tail -5
@@ -550,7 +550,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: All tests PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/Snaipe.Inspector/ViewModels/PropertyRowViewModel.cs tests/Snaipe.Inspector.Tests/PropertyRowViewModelTests.cs
@@ -566,7 +566,7 @@ git commit -m "feat: add ValueChain, ShowValueChainCommand, ShowValueChainVisibi
 - Modify: `src/Snaipe.Inspector/ViewModels/MainViewModel.cs`
 - Create: `tests/Snaipe.Inspector.Tests/PropertyGridViewModelTests.cs`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `tests/Snaipe.Inspector.Tests/PropertyGridViewModelTests.cs`:
 
@@ -662,7 +662,7 @@ public class PropertyGridViewModelTests
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~PropertyGridViewModelTests" 2>&1 | tail -8
@@ -670,7 +670,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: compile errors — `ActiveValueChain`, `ShowValueChain`, etc. do not exist.
 
-- [ ] **Step 3: Add value-chain members to PropertyGridViewModel**
+- [x] **Step 3: Add value-chain members to PropertyGridViewModel**
 
 In `src/Snaipe.Inspector/ViewModels/PropertyGridViewModel.cs`:
 
@@ -754,7 +754,7 @@ In `src/Snaipe.Inspector/ViewModels/PropertyGridViewModel.cs`:
     }
 ```
 
-- [ ] **Step 4: Wire chainCmd in MainViewModel.LoadPropertiesAsync**
+- [x] **Step 4: Wire chainCmd in MainViewModel.LoadPropertiesAsync**
 
 In `src/Snaipe.Inspector/ViewModels/MainViewModel.cs`, find the block inside `LoadPropertiesAsync` that builds `row`:
 
@@ -792,7 +792,7 @@ Replace it with:
                     chainCmd);
 ```
 
-- [ ] **Step 5: Run tests to verify they pass**
+- [x] **Step 5: Run tests to verify they pass**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows --filter "FullyQualifiedName~PropertyGridViewModelTests" 2>&1 | tail -6
@@ -800,7 +800,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: Passed! — Failed: 0, Passed: 5.
 
-- [ ] **Step 6: Run full Inspector test suite**
+- [x] **Step 6: Run full Inspector test suite**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows 2>&1 | tail -5
@@ -808,7 +808,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: All tests PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/Snaipe.Inspector/ViewModels/PropertyGridViewModel.cs src/Snaipe.Inspector/ViewModels/MainViewModel.cs tests/Snaipe.Inspector.Tests/PropertyGridViewModelTests.cs
@@ -822,7 +822,7 @@ git commit -m "feat: add ShowValueChain, ClearValueChain, ActiveValueChain to Pr
 **Files:**
 - Modify: `src/Snaipe.Inspector/Controls/PropertyGridControl.xaml`
 
-- [ ] **Step 1: Add Row 4 definition and the `?` button to the Name column**
+- [x] **Step 1: Add Row 4 definition and the `?` button to the Name column**
 
 In `src/Snaipe.Inspector/Controls/PropertyGridControl.xaml`:
 
@@ -859,7 +859,7 @@ In `src/Snaipe.Inspector/Controls/PropertyGridControl.xaml`:
                             </StackPanel>
 ```
 
-- [ ] **Step 2: Add the value chain panel as Grid Row 4**
+- [x] **Step 2: Add the value chain panel as Grid Row 4**
 
 Add this immediately before the closing `</Grid>` at the end of `PropertyGridControl.xaml`:
 
@@ -964,7 +964,7 @@ Add this immediately before the closing `</Grid>` at the end of `PropertyGridCon
         </Grid>
 ```
 
-- [ ] **Step 3: Build Inspector project**
+- [x] **Step 3: Build Inspector project**
 
 ```bash
 dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v quiet 2>&1 | tail -6
@@ -972,7 +972,7 @@ dotnet build src/Snaipe.Inspector/Snaipe.Inspector.csproj -f net9.0-windows -v q
 
 Expected: Build succeeded, 0 error(s).
 
-- [ ] **Step 4: Run all tests**
+- [x] **Step 4: Run all tests**
 
 ```bash
 dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0-windows 2>&1 | tail -5
@@ -980,7 +980,7 @@ dotnet test tests/Snaipe.Inspector.Tests/Snaipe.Inspector.Tests.csproj -f net9.0
 
 Expected: All tests PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/Snaipe.Inspector/Controls/PropertyGridControl.xaml

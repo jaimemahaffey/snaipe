@@ -170,7 +170,11 @@
         <!-- Property rows -->
         <ListView Grid.Row="3"
                   ItemsSource="{x:Bind ViewModel.FilteredProperties, Mode=OneWay}"
-                  SelectionMode="None">
+                  SelectionMode="None"
+                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollMode="Enabled"
+                  ScrollViewer.VerticalScrollMode="Enabled">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="Padding" Value="0"/>
