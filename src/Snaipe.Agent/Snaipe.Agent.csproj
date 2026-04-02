@@ -4,10 +4,14 @@
     <TargetFrameworks>net9.0;net9.0-windows</TargetFrameworks>
     <RootNamespace>Snaipe.Agent</RootNamespace>
     <Description>In-process agent that walks the Uno visual tree and serves data to the inspector</Description>
+    <IsPackable>true</IsPackable>
+    <PackageId>Snaipe.Agent</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Snaipe.Protocol\Snaipe.Protocol.csproj" />
+    <ProjectReference Include="..\Snaipe.Protocol\Snaipe.Protocol.csproj">
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -21,5 +25,23 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+
+  <!-- Bundle Snaipe.Protocol.dll into this package (private implementation detail) -->
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);BundleProtocol</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <Target Name="BundleProtocol" DependsOnTargets="ResolveAssemblyReferences" Returns="@(TfmSpecificPackageFile)">
+    <GetNuGetShortFolderName
+      TargetFrameworkMoniker="$(TargetFrameworkMoniker)"
+      TargetPlatformMoniker="$(TargetPlatformMoniker)">
+      <Output TaskParameter="NuGetShortFolderName" PropertyName="_BundleProtocolLibFolder" />
+    </GetNuGetShortFolderName>
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'Snaipe.Protocol'">
+        <PackagePath>lib/$(_BundleProtocolLibFolder)</PackagePath>
+      </TfmSpecificPackageFile>
+    </ItemGroup>
+  </Target>
 
 </Project>
