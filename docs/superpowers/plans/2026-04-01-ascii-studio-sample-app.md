@@ -1342,7 +1342,7 @@ git commit -m "feat(sample): add CharacterSetPicker control with card-based sele
 
 The pipeline loads an image via ImageSharp, converts it row-by-row on a background `Task`, and reports progress via `IProgress<int>`. It produces an `AsciiDocument` with colored spans.
 
-- [ ] **Step 1: Create ConversionPipeline.cs**
+- [x] **Step 1: Create ConversionPipeline.cs**
 
 ```csharp
 // samples/Snaipe.SampleApp/Services/ConversionPipeline.cs
@@ -1547,7 +1547,7 @@ public sealed class ConversionPipeline : IDisposable
 }
 ```
 
-- [ ] **Step 2: Build to verify**
+- [x] **Step 2: Build to verify**
 
 ```bash
 dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows -v quiet
@@ -1555,7 +1555,7 @@ dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows 
 
 Expected: succeeds.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add samples/Snaipe.SampleApp/Services/

@@ -3,258 +3,197 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Snaipe.SampleApp.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using WinColor = Windows.UI.Color;
 
 namespace Snaipe.SampleApp.Services;
 
-public static class ConversionPipeline
+public sealed class ConversionPipeline : IDisposable
 {
-    // ── Bayer 4×4 ordered dithering matrix ───────────────────────────
-    private static readonly float[,] Bayer4 =
-    {
-        {  0f/16f,  8f/16f,  2f/16f, 10f/16f },
-        { 12f/16f,  4f/16f, 14f/16f,  6f/16f },
-        {  3f/16f, 11f/16f,  1f/16f,  9f/16f },
-        { 15f/16f,  7f/16f, 13f/16f,  5f/16f }
-    };
+    private CancellationTokenSource? _cts;
+    private Image<Rgba32>? _loadedImage;
+    private string? _loadedPath;
 
-    // ── ANSI 16-color palette (standard terminal colors) ─────────────
-    private static readonly (byte R, byte G, byte B, WinColor WinColor)[] Ansi16 =
-    {
-        (  0,   0,   0, FromRgb(  0,   0,   0)),  // 0  black
-        (128,   0,   0, FromRgb(128,   0,   0)),  // 1  dark red
-        (  0, 128,   0, FromRgb(  0, 128,   0)),  // 2  dark green
-        (128, 128,   0, FromRgb(128, 128,   0)),  // 3  dark yellow
-        (  0,   0, 128, FromRgb(  0,   0, 128)),  // 4  dark blue
-        (128,   0, 128, FromRgb(128,   0, 128)),  // 5  dark magenta
-        (  0, 128, 128, FromRgb(  0, 128, 128)),  // 6  dark cyan
-        (192, 192, 192, FromRgb(192, 192, 192)),  // 7  light gray
-        (128, 128, 128, FromRgb(128, 128, 128)),  // 8  dark gray
-        (255,   0,   0, FromRgb(255,   0,   0)),  // 9  bright red
-        (  0, 255,   0, FromRgb(  0, 255,   0)),  // 10 bright green
-        (255, 255,   0, FromRgb(255, 255,   0)),  // 11 bright yellow
-        (  0,   0, 255, FromRgb(  0,   0, 255)),  // 12 bright blue
-        (255,   0, 255, FromRgb(255,   0, 255)),  // 13 bright magenta
-        (  0, 255, 255, FromRgb(  0, 255, 255)),  // 14 bright cyan
-        (255, 255, 255, FromRgb(255, 255, 255)),  // 15 white
-    };
+    // ── ANSI 16-color palette (approximated as RGB) ───────────────────
+    private static readonly (global::Windows.UI.Color Color, string Name)[] Ansi16 =
+    [
+        (global::Windows.UI.Color.FromArgb(0xFF,   0,   0,   0), "Black"),
+        (global::Windows.UI.Color.FromArgb(0xFF, 128,   0,   0), "DarkRed"),
+        (global::Windows.UI.Color.FromArgb(0xFF,   0, 128,   0), "DarkGreen"),
+        (global::Windows.UI.Color.FromArgb(0xFF, 128, 128,   0), "DarkYellow"),
+        (global::Windows.UI.Color.FromArgb(0xFF,   0,   0, 128), "DarkBlue"),
+        (global::Windows.UI.Color.FromArgb(0xFF, 128,   0, 128), "DarkMagenta"),
+        (global::Windows.UI.Color.FromArgb(0xFF,   0, 128, 128), "DarkCyan"),
+        (global::Windows.UI.Color.FromArgb(0xFF, 192, 192, 192), "Gray"),
+        (global::Windows.UI.Color.FromArgb(0xFF, 128, 128, 128), "DarkGray"),
+        (global::Windows.UI.Color.FromArgb(0xFF, 255,   0,   0), "Red"),
+        (global::Windows.UI.Color.FromArgb(0xFF,   0, 255,   0), "Green"),
+        (global::Windows.UI.Color.FromArgb(0xFF, 255, 255,   0), "Yellow"),
+        (global::Windows.UI.Color.FromArgb(0xFF,   0,   0, 255), "Blue"),
+        (global::Windows.UI.Color.FromArgb(0xFF, 255,   0, 255), "Magenta"),
+        (global::Windows.UI.Color.FromArgb(0xFF,   0, 255, 255), "Cyan"),
+        (global::Windows.UI.Color.FromArgb(0xFF, 255, 255, 255), "White"),
+    ];
 
-    private static WinColor FromRgb(byte r, byte g, byte b)
-        => WinColor.FromArgb(255, r, g, b);
-
-    // ── Public entry point ────────────────────────────────────────────
-
-    public static Task<AsciiDocument> ConvertAsync(
-        string imagePath,
-        ConversionSettings settings,
-        IProgress<int>? progress = null,
-        CancellationToken ct = default)
-        => Task.Run(() => ConvertCore(imagePath, settings, progress, ct), ct);
-
-    // ── Core conversion ───────────────────────────────────────────────
-
-    private static AsciiDocument ConvertCore(
+    public async Task<AsciiDocument> ConvertAsync(
         string imagePath,
         ConversionSettings settings,
         IProgress<int>? progress,
         CancellationToken ct)
     {
-        using var image = SixLabors.ImageSharp.Image.Load<Rgba32>(imagePath);
-
-        // Scale width to target columns; maintain aspect ratio (chars are ~2× taller than wide)
-        int targetWidth  = settings.OutputWidth;
-        float aspect     = (float)image.Height / image.Width;
-        int targetHeight = Math.Max(1, (int)(targetWidth * aspect * 0.5f));
-
-        image.Mutate(x => x.Resize(targetWidth, targetHeight));
-
-        var chars = settings.GetChars();
-        ct.ThrowIfCancellationRequested();
-
-        // Copy pixels to float arrays for dithering
-        int w = image.Width, h = image.Height;
-        var rCh = new float[h, w];
-        var gCh = new float[h, w];
-        var bCh = new float[h, w];
-
-        for (int y = 0; y < h; y++)
-            for (int x = 0; x < w; x++)
-            {
-                var px = image[x, y];
-                rCh[y, x] = px.R / 255f;
-                gCh[y, x] = px.G / 255f;
-                bCh[y, x] = px.B / 255f;
-            }
-
-        if (settings.Dithering == DitheringAlgorithm.FloydSteinberg)
-            ApplyFloydSteinberg(rCh, gCh, bCh, w, h, settings.ColorMode);
-        else if (settings.Dithering == DitheringAlgorithm.BayerOrdered)
-            ApplyBayer(rCh, gCh, bCh, w, h, settings.ColorMode);
-
-        var lines = new List<AsciiLine>(h);
-
-        for (int y = 0; y < h; y++)
+        // Load image (cache if same path)
+        if (_loadedPath != imagePath)
         {
-            ct.ThrowIfCancellationRequested();
-            progress?.Report((y * 100) / h);
-            lines.Add(BuildLine(y, w, chars, rCh, gCh, bCh, settings));
+            _loadedImage?.Dispose();
+            _loadedImage = await Image.LoadAsync<Rgba32>(imagePath, ct);
+            _loadedPath = imagePath;
         }
 
-        progress?.Report(100);
+        var src = _loadedImage!;
+
+        // Resize: ASCII chars are roughly 2× taller than wide, so halve the height
+        const double aspectCorrection = 0.5;
+        int targetW = Math.Max(1, settings.OutputWidth);
+        int targetH = Math.Max(1, (int)(src.Height * ((double)targetW / src.Width) * aspectCorrection));
+
+        using var resized = src.Clone(ctx => ctx.Resize(targetW, targetH));
+
+        var chars = settings.GetChars();
+        var lines = new List<AsciiLine>(targetH);
+
+        // Build dithering error buffer for Floyd-Steinberg
+        var errorR = new double[targetH, targetW];
+        var errorG = new double[targetH, targetW];
+        var errorB = new double[targetH, targetW];
+
+        // Bayer 4×4 matrix (values 0–15, threshold at 8)
+        int[,] bayer4 = {
+            {  0,  8,  2, 10 },
+            { 12,  4, 14,  6 },
+            {  3, 11,  1,  9 },
+            { 15,  7, 13,  5 }
+        };
+
+        for (int row = 0; row < targetH; row++)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            var spans = new List<AsciiSpan>();
+            string? currentText = null;
+            global::Windows.UI.Color? currentColor = null;
+            var runBuffer = new System.Text.StringBuilder();
+
+            for (int col = 0; col < targetW; col++)
+            {
+                var pixel = resized[col, row];
+
+                double r = pixel.R / 255.0;
+                double g = pixel.G / 255.0;
+                double b = pixel.B / 255.0;
+
+                // Apply accumulated dithering error
+                if (settings.Dithering == DitheringAlgorithm.FloydSteinberg)
+                {
+                    r = Math.Clamp(r + errorR[row, col], 0, 1);
+                    g = Math.Clamp(g + errorG[row, col], 0, 1);
+                    b = Math.Clamp(b + errorB[row, col], 0, 1);
+                }
+                else if (settings.Dithering == DitheringAlgorithm.BayerOrdered)
+                {
+                    double threshold = bayer4[row % 4, col % 4] / 16.0 - 0.5;
+                    r = Math.Clamp(r + threshold * 0.25, 0, 1);
+                    g = Math.Clamp(g + threshold * 0.25, 0, 1);
+                    b = Math.Clamp(b + threshold * 0.25, 0, 1);
+                }
+
+                double brightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+                if (settings.Invert) brightness = 1 - brightness;
+
+                int charIndex = (int)(brightness * (chars.Length - 1));
+                charIndex = Math.Clamp(charIndex, 0, chars.Length - 1);
+                string ch = chars[charIndex];
+
+                // Propagate Floyd-Steinberg error
+                if (settings.Dithering == DitheringAlgorithm.FloydSteinberg)
+                {
+                    double quantR = brightness - (double)charIndex / (chars.Length - 1);
+                    PropagateFSError(errorR, row, col, targetW, targetH, r - (r - quantR * 0.5));
+                    PropagateFSError(errorG, row, col, targetW, targetH, g - (g - quantR * 0.5));
+                    PropagateFSError(errorB, row, col, targetW, targetH, b - (b - quantR * 0.5));
+                }
+
+                // Determine color for this character
+                global::Windows.UI.Color? spanColor = settings.ColorMode switch
+                {
+                    ColorMode.Grayscale => null,
+                    ColorMode.Ansi16    => NearestAnsi16(r, g, b),
+                    ColorMode.Ansi256   => Ansi256Color(r, g, b),
+                    ColorMode.TrueColor => global::Windows.UI.Color.FromArgb(0xFF,
+                        (byte)(r * 255), (byte)(g * 255), (byte)(b * 255)),
+                    _ => null
+                };
+
+                // Run-length encode: flush run if color changes
+                if (spanColor != currentColor && runBuffer.Length > 0)
+                {
+                    spans.Add(new AsciiSpan(runBuffer.ToString(), currentColor));
+                    runBuffer.Clear();
+                }
+                currentColor = spanColor;
+                runBuffer.Append(ch);
+            }
+
+            if (runBuffer.Length > 0)
+                spans.Add(new AsciiSpan(runBuffer.ToString(), currentColor));
+
+            lines.Add(new AsciiLine(spans));
+            progress?.Report((row + 1) * 100 / targetH);
+        }
+
         return new AsciiDocument(lines);
     }
 
-    // ── Line builder ─────────────────────────────────────────────────
-
-    private static AsciiLine BuildLine(
-        int y, int w, string[] chars,
-        float[,] rCh, float[,] gCh, float[,] bCh,
-        ConversionSettings settings)
+    private static void PropagateFSError(double[,] err, int row, int col, int w, int h, double e)
     {
-        var spans = new List<AsciiSpan>(w);
-        AsciiSpan? current = null;
-
-        for (int x = 0; x < w; x++)
+        if (col + 1 < w)         err[row,     col + 1] += e * 7 / 16.0;
+        if (row + 1 < h)
         {
-            float r = rCh[y, x], g = gCh[y, x], b = bCh[y, x];
-            float luma = 0.2126f * r + 0.7152f * g + 0.0722f * b;
-            int charIdx = (int)(luma * (chars.Length - 1));
-            charIdx = Math.Clamp(charIdx, 0, chars.Length - 1);
-            string ch = chars[charIdx];
-
-            WinColor? color = settings.ColorMode switch
-            {
-                ColorMode.Grayscale  => null,
-                ColorMode.Ansi16    => NearestAnsi16(r, g, b),
-                ColorMode.Ansi256   => NearestAnsi256(r, g, b),
-                ColorMode.TrueColor => FromRgb((byte)(r * 255), (byte)(g * 255), (byte)(b * 255)),
-                _                   => null
-            };
-
-            // Run-length encode: merge adjacent same-color spans
-            if (current is not null && current.Color == color)
-            {
-                current = new AsciiSpan(current.Text + ch, color);
-                spans[^1] = current;
-            }
-            else
-            {
-                current = new AsciiSpan(ch, color);
-                spans.Add(current);
-            }
-        }
-
-        return new AsciiLine(spans);
-    }
-
-    // ── Floyd-Steinberg dithering ─────────────────────────────────────
-
-    private static void ApplyFloydSteinberg(
-        float[,] r, float[,] g, float[,] b,
-        int w, int h, ColorMode mode)
-    {
-        for (int y = 0; y < h; y++)
-        for (int x = 0; x < w; x++)
-        {
-            float oldR = r[y, x], oldG = g[y, x], oldB = b[y, x];
-            (float nr, float ng, float nb) = Quantize(oldR, oldG, oldB, mode);
-            r[y, x] = nr; g[y, x] = ng; b[y, x] = nb;
-
-            float errR = oldR - nr, errG = oldG - ng, errB = oldB - nb;
-            DiffuseError(r, g, b, w, h, x + 1, y,     errR, errG, errB, 7f / 16f);
-            DiffuseError(r, g, b, w, h, x - 1, y + 1, errR, errG, errB, 3f / 16f);
-            DiffuseError(r, g, b, w, h, x,     y + 1, errR, errG, errB, 5f / 16f);
-            DiffuseError(r, g, b, w, h, x + 1, y + 1, errR, errG, errB, 1f / 16f);
+            if (col > 0)         err[row + 1, col - 1] += e * 3 / 16.0;
+                                 err[row + 1, col    ] += e * 5 / 16.0;
+            if (col + 1 < w)     err[row + 1, col + 1] += e * 1 / 16.0;
         }
     }
 
-    private static void DiffuseError(
-        float[,] r, float[,] g, float[,] b,
-        int w, int h, int x, int y,
-        float errR, float errG, float errB, float weight)
+    private static global::Windows.UI.Color NearestAnsi16(double r, double g, double b)
     {
-        if (x < 0 || x >= w || y < 0 || y >= h) return;
-        r[y, x] = Math.Clamp(r[y, x] + errR * weight, 0f, 1f);
-        g[y, x] = Math.Clamp(g[y, x] + errG * weight, 0f, 1f);
-        b[y, x] = Math.Clamp(b[y, x] + errB * weight, 0f, 1f);
-    }
-
-    // ── Bayer ordered dithering ───────────────────────────────────────
-
-    private static void ApplyBayer(
-        float[,] r, float[,] g, float[,] b,
-        int w, int h, ColorMode mode)
-    {
-        for (int y = 0; y < h; y++)
-        for (int x = 0; x < w; x++)
+        double minDist = double.MaxValue;
+        global::Windows.UI.Color best = Ansi16[0].Color;
+        foreach (var (color, _) in Ansi16)
         {
-            float threshold = Bayer4[y % 4, x % 4] - 0.5f;
-            r[y, x] = Math.Clamp(r[y, x] + threshold * 0.5f, 0f, 1f);
-            g[y, x] = Math.Clamp(g[y, x] + threshold * 0.5f, 0f, 1f);
-            b[y, x] = Math.Clamp(b[y, x] + threshold * 0.5f, 0f, 1f);
+            double dr = r - color.R / 255.0;
+            double dg = g - color.G / 255.0;
+            double db = b - color.B / 255.0;
+            double dist = dr * dr + dg * dg + db * db;
+            if (dist < minDist) { minDist = dist; best = color; }
         }
+        return best;
     }
 
-    // ── Color quantization helpers ────────────────────────────────────
-
-    private static (float r, float g, float b) Quantize(float r, float g, float b, ColorMode mode)
-        => mode switch
-        {
-            ColorMode.Grayscale  => QuantizeGray(r, g, b),
-            ColorMode.Ansi16    => QuantizeAnsi16(r, g, b),
-            ColorMode.Ansi256   => QuantizeAnsi256(r, g, b),
-            _                   => (r, g, b)
-        };
-
-    private static (float, float, float) QuantizeGray(float r, float g, float b)
+    private static global::Windows.UI.Color Ansi256Color(double r, double g, double b)
     {
-        float luma = 0.2126f * r + 0.7152f * g + 0.0722f * b;
-        float q = MathF.Round(luma * 4f) / 4f;
-        return (q, q, q);
+        // Map to 6×6×6 color cube (indices 16–231)
+        int ri = (int)(r * 5 + 0.5);
+        int gi = (int)(g * 5 + 0.5);
+        int bi = (int)(b * 5 + 0.5);
+        byte rv = (byte)(ri == 0 ? 0 : 55 + ri * 40);
+        byte gv = (byte)(gi == 0 ? 0 : 55 + gi * 40);
+        byte bv = (byte)(bi == 0 ? 0 : 55 + bi * 40);
+        return global::Windows.UI.Color.FromArgb(0xFF, rv, gv, bv);
     }
 
-    private static (float, float, float) QuantizeAnsi16(float r, float g, float b)
-    {
-        var (idx, _) = NearestAnsi16Idx(r, g, b);
-        return (Ansi16[idx].R / 255f, Ansi16[idx].G / 255f, Ansi16[idx].B / 255f);
-    }
+    public void Cancel() => _cts?.Cancel();
 
-    private static (float, float, float) QuantizeAnsi256(float r, float g, float b)
+    public void Dispose()
     {
-        // Quantize to 6-level RGB cube
-        float Snap(float v) => MathF.Round(v * 5f) / 5f;
-        return (Snap(r), Snap(g), Snap(b));
-    }
-
-    private static WinColor NearestAnsi16(float r, float g, float b)
-    {
-        var (_, color) = NearestAnsi16Idx(r, g, b);
-        return color;
-    }
-
-    private static (int idx, WinColor color) NearestAnsi16Idx(float r, float g, float b)
-    {
-        int best = 0;
-        float bestDist = float.MaxValue;
-        for (int i = 0; i < Ansi16.Length; i++)
-        {
-            float dr = r - Ansi16[i].R / 255f;
-            float dg = g - Ansi16[i].G / 255f;
-            float db = b - Ansi16[i].B / 255f;
-            float dist = dr * dr + dg * dg + db * db;
-            if (dist < bestDist) { bestDist = dist; best = i; }
-        }
-        return (best, Ansi16[best].WinColor);
-    }
-
-    private static WinColor NearestAnsi256(float r, float g, float b)
-    {
-        // Map to 6-level cube
-        byte Snap(float v) => (byte)(MathF.Round(v * 5f) / 5f * 255f);
-        return FromRgb(Snap(r), Snap(g), Snap(b));
+        _cts?.Dispose();
+        _loadedImage?.Dispose();
     }
 }
