@@ -12,15 +12,18 @@ public sealed class SnaipeAgent : IDisposable
     private readonly Window _window;
     private readonly ElementTracker _tracker;
     private readonly HighlightOverlay _highlight;
+    private readonly AgentEventServer _eventServer;
     private CancellationTokenSource? _cts;
     private AgentIpcServer? _ipcServer;
     private AgentDiscovery? _discovery;
+    private PickModeManager? _pickMode;
 
     private SnaipeAgent(Window window)
     {
         _window = window;
         _tracker = new ElementTracker();
         _highlight = new HighlightOverlay(window, _tracker);
+        _eventServer = new AgentEventServer($"snaipe-{Environment.ProcessId}-events");
     }
 
     /// <summary>
@@ -42,25 +45,40 @@ public sealed class SnaipeAgent : IDisposable
 
             Console.WriteLine($"[Snaipe.Agent] Starting agent with pipe name: {pipeName}");
 
-            // Write discovery file.
+            // Write discovery file (includes eventsPipeName).
             _discovery = AgentDiscovery.Create(pipeName, _window.Title ?? "Untitled");
             Console.WriteLine("[Snaipe.Agent] Discovery file created.");
 
-            // Start IPC server on a background thread.
+            // Start command IPC server on a background task.
             _ipcServer = new AgentIpcServer(pipeName);
             _ = Task.Run(async () =>
             {
-                try
-                {
-                    await _ipcServer.RunAsync(HandleMessageAsync, _cts.Token);
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"[Snaipe.Agent] IPC server error: {ex}");
-                }
+                try { await _ipcServer.RunAsync(HandleMessageAsync, _cts.Token); }
+                catch (Exception ex) { Console.Error.WriteLine($"[Snaipe.Agent] IPC server error: {ex}"); }
             }, _cts.Token);
 
-            // Register cleanup handlers.
+            // Start events push pipe on a background task.
+            _ = Task.Run(async () =>
+            {
+                try { await _eventServer.RunAsync(_cts.Token); }
+                catch (Exception ex) { Console.Error.WriteLine($"[Snaipe.Agent] Event server error: {ex}"); }
+            }, _cts.Token);
+
+            // Attach PickModeManager on the UI thread once Window.Content is available.
+            _window.DispatcherQueue.TryEnqueue(() =>
+            {
+                if (_window.Content is UIElement root)
+                {
+                    _pickMode = new PickModeManager(root, _tracker, _highlight, _eventServer);
+                    _pickMode.Attach();
+                    Console.WriteLine("[Snaipe.Agent] PickModeManager attached (Ctrl+Shift to pick).");
+                }
+                else
+                {
+                    Console.WriteLine("[Snaipe.Agent] Window.Content not set — PickModeManager skipped.");
+                }
+            });
+
             AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
 
             Console.WriteLine($"[Snaipe.Agent] Attached to window. Pipe: {pipeName}");
@@ -92,7 +110,6 @@ public sealed class SnaipeAgent : IDisposable
 
     private Task<InspectorMessage> HandleGetTree(InspectorMessage request)
     {
-        // Tree walk must happen on the UI thread.
         var tcs = new TaskCompletionSource<InspectorMessage>();
 
         _window.DispatcherQueue.TryEnqueue(() =>
@@ -101,11 +118,15 @@ public sealed class SnaipeAgent : IDisposable
             {
                 if (_window.Content is UIElement root)
                 {
-                    var tree = VisualTreeWalker.BuildTree(root, _tracker);
+                    var xamlRoot = root.XamlRoot;
+                    var roots = xamlRoot is not null
+                        ? VisualTreeWalker.BuildTree(root, xamlRoot, _tracker)
+                        : [VisualTreeWalker.BuildTree(root, _tracker)];
+
                     tcs.SetResult(new TreeResponse
                     {
                         MessageId = request.MessageId,
-                        Root = tree,
+                        Roots = roots,
                     });
                 }
                 else
@@ -157,7 +178,6 @@ public sealed class SnaipeAgent : IDisposable
 
                 if (request.PropertyPath is { Length: > 0 })
                 {
-                    // Drill-down path: resolve to the nested object and read its CLR properties.
                     var (resolved, errorCode, errorMessage) =
                         PropertyPathResolver.Resolve(element, request.PropertyPath);
 
@@ -176,10 +196,8 @@ public sealed class SnaipeAgent : IDisposable
                 }
                 else
                 {
-                    // Root-level: existing DependencyProperty reader.
                     properties = PropertyReader.GetProperties(element);
 
-                    // Prepend live bounds info (only for direct element inspection).
                     if (_window.Content is UIElement root)
                     {
                         var bounds = VisualTreeWalker.GetBoundsRelativeTo(element, root);
@@ -244,7 +262,6 @@ public sealed class SnaipeAgent : IDisposable
 
                 if (request.PropertyPath is { Length: > 0 })
                 {
-                    // Drill-down path: resolve to the nested object, then write the leaf property.
                     var (resolved, errorCode, errorMessage) =
                         PropertyPathResolver.Resolve(element, request.PropertyPath);
 
@@ -325,19 +342,13 @@ public sealed class SnaipeAgent : IDisposable
         return tcs.Task;
     }
 
-    private void OnProcessExit(object? sender, EventArgs e)
-    {
-        Dispose();
-    }
+    private void OnProcessExit(object? sender, EventArgs e) => Dispose();
 
-    /// <summary>
-    /// Snapshot the current visual tree.
-    /// </summary>
+    /// <summary>Snapshot the current visual tree.</summary>
     public ElementNode? GetTree()
     {
         if (_window.Content is UIElement root)
             return VisualTreeWalker.BuildTree(root, _tracker);
-
         return null;
     }
 
@@ -345,7 +356,17 @@ public sealed class SnaipeAgent : IDisposable
     {
         AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
         _cts?.Cancel();
+
+        // Detach pick mode on UI thread (best effort).
+        if (_pickMode is not null)
+        {
+            var pm = _pickMode;
+            _window.DispatcherQueue.TryEnqueue(() => pm.Detach());
+            _pickMode = null;
+        }
+
         _highlight.Dispose();
+        _eventServer.Dispose();
         _ipcServer?.Dispose();
         _discovery?.Dispose();
         _tracker.Dispose();
