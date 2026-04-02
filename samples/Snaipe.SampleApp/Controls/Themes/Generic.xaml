@@ -98,4 +98,87 @@
         </Setter>
     </Style>
 
+    <!-- ══ AsciiOutputControl ════════════════════════════════════════ -->
+    <Style TargetType="local:AsciiOutputControl">
+        <Setter Property="Background" Value="#020617"/>
+        <Setter Property="FontFamily" Value="Cascadia Code, Consolas, monospace"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:AsciiOutputControl">
+                    <Grid Background="{TemplateBinding Background}">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="DisplayStates">
+                                <VisualState x:Name="Empty">
+                                    <VisualState.Setters>
+                                        <Setter Target="EmptyHint.Visibility" Value="Visible"/>
+                                        <Setter Target="OutputScroll.Visibility" Value="Collapsed"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Idle"/>
+                                <VisualState x:Name="Converting">
+                                    <VisualState.Setters>
+                                        <Setter Target="ProgressOverlay.Visibility" Value="Visible"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Error">
+                                    <VisualState.Setters>
+                                        <Setter Target="ErrorPanel.Visibility" Value="Visible"/>
+                                        <Setter Target="OutputScroll.Visibility" Value="Collapsed"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+
+                        <ScrollViewer x:Name="OutputScroll"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Auto">
+                            <RichTextBlock x:Name="PART_RichText"
+                                           IsTextSelectionEnabled="True"
+                                           FontFamily="{TemplateBinding FontFamily}"/>
+                        </ScrollViewer>
+
+                        <Border x:Name="ProgressOverlay"
+                                Visibility="Collapsed"
+                                Background="#C0020617">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                                <ProgressBar x:Name="PART_Progress"
+                                             Width="240"
+                                             Minimum="0" Maximum="100"/>
+                                <TextBlock Text="Converting…"
+                                           HorizontalAlignment="Center"
+                                           Foreground="#64748B"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border x:Name="ErrorPanel"
+                                Visibility="Collapsed"
+                                Background="#C0200000">
+                            <TextBlock x:Name="PART_ErrorText"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="#F87171"
+                                       TextWrapping="Wrap"
+                                       Margin="16"/>
+                        </Border>
+
+                        <Border x:Name="EmptyHint"
+                                Visibility="Collapsed"
+                                Background="#020617">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                                <TextBlock Text="No output yet"
+                                           FontSize="14"
+                                           Foreground="#1E3A5F"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="Open an image and click Convert"
+                                           FontSize="12"
+                                           Foreground="#1E293B"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
