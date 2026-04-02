@@ -9,7 +9,6 @@ public static class Program
     {
         var host = UnoPlatformHostBuilder.Create()
             .App(() => new App())
-            .UseX11()
             .UseWin32()
             .Build();
 

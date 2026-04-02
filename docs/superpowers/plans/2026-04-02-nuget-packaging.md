@@ -172,11 +172,11 @@ Replace the entire file with:
     <PackageId>Snaipe</PackageId>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>snaipe</ToolCommandName>
+    <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -223,7 +223,7 @@ Replace the entire file with:
 - [ ] **Step 2: Pack and verify tool package**
 
 ```bash
-dotnet pack src/Snaipe.Inspector/Snaipe.Inspector.csproj -c Release -p:Version=0.0.1-verify -f net9.0-windows -o ./nupkg-verify -v quiet
+dotnet pack src/Snaipe.Inspector/Snaipe.Inspector.csproj -c Release -p:Version=0.0.1-verify -o ./nupkg-verify -v quiet
 ```
 
 Then inspect:
@@ -233,8 +233,8 @@ unzip -l ./nupkg-verify/Snaipe.0.0.1-verify.nupkg
 ```
 
 Expected output must include:
-- `tools/net9.0-windows/any/snaipe.exe` (or similar path under `tools/`)
-- `tools/net9.0-windows/any/DotnetToolSettings.xml`
+- `tools/net9.0/any/Snaipe.Inspector.dll` (or similar path under `tools/`)
+- `tools/net9.0/any/DotnetToolSettings.xml`
 
 - [ ] **Step 3: Clean up test output**
 
