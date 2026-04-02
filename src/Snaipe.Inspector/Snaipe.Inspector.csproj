@@ -4,11 +4,15 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Snaipe.Inspector</RootNamespace>
     <Description>Standalone visual tree inspector UI for Uno Skia Desktop apps</Description>
+    <IsPackable>true</IsPackable>
+    <PackageId>Snaipe</PackageId>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>snaipe</ToolCommandName>
+    <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
