@@ -1168,7 +1168,7 @@ git commit -m "feat(sample): add AsciiOutputControl with DisplayStates and RichT
 
 `CharacterSetPicker` renders a 2×2 grid of selectable cards, one per `CharacterSet`. Raises `SelectionChanged` event when the user clicks a card.
 
-- [ ] **Step 1: Create CharacterSetPicker.cs**
+- [x] **Step 1: Create CharacterSetPicker.cs**
 
 ```csharp
 // samples/Snaipe.SampleApp/Controls/CharacterSetPicker.cs
@@ -1303,7 +1303,7 @@ public sealed class CharacterSetPicker : Control
 }
 ```
 
-- [ ] **Step 2: Append CharacterSetPicker style to Generic.xaml**
+- [x] **Step 2: Append CharacterSetPicker style to Generic.xaml**
 
 ```xml
     <!-- ══ CharacterSetPicker ════════════════════════════════════════ -->
@@ -1318,7 +1318,7 @@ public sealed class CharacterSetPicker : Control
     </Style>
 ```
 
-- [ ] **Step 3: Build to verify**
+- [x] **Step 3: Build to verify**
 
 ```bash
 dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows -v quiet
