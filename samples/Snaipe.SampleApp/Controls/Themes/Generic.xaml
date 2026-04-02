@@ -1,4 +1,37 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Snaipe.SampleApp.Controls">
+
+    <!-- ══ SplitPanel ══════════════════════════════════════════════════ -->
+    <Style TargetType="local:SplitPanel">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:SplitPanel">
+                    <Grid x:Name="PART_LayoutGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ContentPresenter Grid.Column="0"
+                                          Content="{TemplateBinding Pane1Content}"/>
+
+                        <Grid x:Name="PART_Divider"
+                              Grid.Column="1"
+                              Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}">
+                            <Rectangle Width="1"
+                                       HorizontalAlignment="Center"
+                                       Fill="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                        </Grid>
+
+                        <ContentPresenter Grid.Column="2"
+                                          Content="{TemplateBinding Pane2Content}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
