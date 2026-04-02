@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>Snaipe.SampleApp</RootNamespace>
-    <Description>Minimal Uno Skia Desktop app for testing Snaipe</Description>
+    <Description>ASCII Studio — image to ASCII art converter (Snaipe inspector sample app)</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
@@ -18,15 +18,31 @@
   <ItemGroup>
     <PackageReference Include="Uno.WinUI" Version="6.5.153" />
     <PackageReference Include="Uno.WinUI.Skia.X11" Version="6.5.153" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.9" />
   </ItemGroup>
 
-  <!-- Windows-only: native Win32 Skia host (Uno 6+) -->
   <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
     <PackageReference Include="Uno.WinUI.Runtime.Skia.Win32" Version="6.5.153" />
   </ItemGroup>
 
   <ItemGroup>
     <Page Include="MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ImagePreviewControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\AsciiPreviewWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ExportDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
