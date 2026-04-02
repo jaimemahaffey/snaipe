@@ -18,9 +18,12 @@ namespace Snaipe.Protocol;
 [JsonSerializable(typeof(PropertiesResponse))]
 [JsonSerializable(typeof(AckResponse))]
 [JsonSerializable(typeof(ErrorResponse))]
+[JsonSerializable(typeof(ElementUnderCursorEvent))]
+[JsonSerializable(typeof(PickModeActiveEvent))]
 [JsonSerializable(typeof(ElementNode))]
 [JsonSerializable(typeof(BoundsInfo))]
 [JsonSerializable(typeof(PropertyEntry))]
+[JsonSerializable(typeof(List<ElementNode>))]
 [JsonSerializable(typeof(List<string>))]
 [JsonSerializable(typeof(string[]))]
 internal partial class ProtocolJsonContext : JsonSerializerContext;

@@ -14,6 +14,8 @@ namespace Snaipe.Protocol;
 [JsonDerivedType(typeof(PropertiesResponse), "PropertiesResponse")]
 [JsonDerivedType(typeof(AckResponse), "AckResponse")]
 [JsonDerivedType(typeof(ErrorResponse), "ErrorResponse")]
+[JsonDerivedType(typeof(ElementUnderCursorEvent), "ElementUnderCursorEvent")]
+[JsonDerivedType(typeof(PickModeActiveEvent), "PickModeActiveEvent")]
 public abstract record InspectorMessage
 {
     public required string MessageId { get; init; }
@@ -51,11 +53,15 @@ public sealed record HighlightElementRequest : InspectorMessage
     public bool Show { get; init; } = true;
 }
 
-// --- Agent → Inspector ---
+// --- Agent → Inspector (request/response) ---
 
 public sealed record TreeResponse : InspectorMessage
 {
-    public required ElementNode Root { get; init; }
+    /// <summary>
+    /// Element [0] is always the Window.Content subtree.
+    /// Additional elements are open popup subtrees tagged TypeName = "[Popup]".
+    /// </summary>
+    public required List<ElementNode> Roots { get; init; }
 }
 
 public sealed record PropertiesResponse : InspectorMessage
@@ -77,4 +83,25 @@ public sealed record ErrorResponse : InspectorMessage
     public required int ErrorCode { get; init; }
     public required string Error { get; init; }
     public string? Details { get; init; }
+}
+
+// --- Agent → Inspector (push events, not responses to requests) ---
+
+/// <summary>
+/// Sent by the agent while Ctrl+Shift is held and the pointer moves over an element.
+/// The inspector uses this to select and scroll to the element in the tree.
+/// </summary>
+public sealed record ElementUnderCursorEvent : InspectorMessage
+{
+    public required string ElementId { get; init; }
+    /// <summary>Short type name for the status bar — avoids an extra GetProperties round-trip.</summary>
+    public required string TypeName { get; init; }
+}
+
+/// <summary>
+/// Sent when pick mode activates (modifier held) or deactivates (modifier released).
+/// </summary>
+public sealed record PickModeActiveEvent : InspectorMessage
+{
+    public bool Active { get; init; }
 }
