@@ -29,6 +29,44 @@ public static class VisualTreeWalker
     }
 
     /// <summary>
+    /// Build a snapshot of the visual tree including open popup subtrees.
+    /// Returns a list where element [0] is the Window.Content subtree and
+    /// subsequent elements are open popups (TypeName = "[Popup]").
+    /// </summary>
+    public static List<ElementNode> BuildTree(
+        UIElement windowContent, XamlRoot xamlRoot, ElementTracker tracker)
+    {
+        var roots = new List<ElementNode>
+        {
+            Walk(windowContent, parent: null, windowContent, tracker, depth: 0)
+        };
+
+        try
+        {
+            var openPopups = VisualTreeHelper.GetOpenPopupsForXamlRoot(xamlRoot);
+            foreach (var popup in openPopups)
+            {
+                if (popup.Child is not UIElement popupChild) continue;
+
+                var popupRoot = new ElementNode
+                {
+                    Id = tracker.GetOrAssignId(popup.Child),
+                    TypeName = "[Popup]",
+                    Name = popup.Name is { Length: > 0 } ? popup.Name : null,
+                    Children = { Walk(popupChild, parent: null, popupChild, tracker, depth: 0) },
+                };
+                roots.Add(popupRoot);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[VisualTreeWalker] Popup enumeration failed: {ex.Message}");
+        }
+
+        return roots;
+    }
+
+    /// <summary>
     /// Legacy overload — builds tree without an ElementTracker (uses hash-based IDs).
     /// </summary>
     public static ElementNode BuildTree(UIElement root)
