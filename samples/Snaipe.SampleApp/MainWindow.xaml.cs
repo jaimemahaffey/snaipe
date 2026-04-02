@@ -18,7 +18,7 @@ public sealed partial class MainWindow : Window
         Title = "ASCII Studio";
 
         _vm = new ShellViewModel(DispatcherQueue);
-        Content.DataContext = _vm;
+        if (Content is FrameworkElement fe) fe.DataContext = _vm;
 
         // Wire up VM requests
         _vm.RequestOpenPreviewWindow  = OpenPreviewWindow;
@@ -32,26 +32,11 @@ public sealed partial class MainWindow : Window
         };
     }
 
-    private void OnOpenClicked(object sender, PointerRoutedEventArgs e)
-        => _ = _vm.OpenImageCommand.ExecuteAsync();
-
-    private void OnConvertClicked(object sender, PointerRoutedEventArgs e)
-        => _ = _vm.ConvertCommand.ExecuteAsync();
-
-    private void OnExportClicked(object sender, PointerRoutedEventArgs e)
-        => _vm.ShowExportDialogCommand.Execute(null);
-
-    private void OnCopyClicked(object sender, PointerRoutedEventArgs e)
-        => _vm.CopyToClipboardCommand.Execute(null);
-
     private void OnToggleGridClicked(object sender, PointerRoutedEventArgs e)
     {
         SettingsFlyout.Visibility = SettingsFlyout.Visibility == Visibility.Visible
             ? Visibility.Collapsed : Visibility.Visible;
     }
-
-    private void OnTogglePreviewClicked(object sender, PointerRoutedEventArgs e)
-        => _vm.TogglePreviewWindowCommand.Execute(null);
 
     private void OpenPreviewWindow()
     {
@@ -75,7 +60,7 @@ public sealed partial class MainWindow : Window
     private async void ShowExportDialog()
     {
         var dialog = new ExportDialog(_vm.Export);
-        dialog.XamlRoot = this.Content.XamlRoot;
+        if (this.Content?.XamlRoot is { } root) dialog.XamlRoot = root;
         await dialog.ShowAsync();
     }
 }

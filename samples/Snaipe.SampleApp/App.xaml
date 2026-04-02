@@ -1,0 +1,214 @@
+<Application
+    x:Class="Snaipe.SampleApp.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Snaipe.SampleApp.Controls">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- ══ SplitPanel ══════════════════════════════════════════════════ -->
+            <Style TargetType="local:SplitPanel">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="local:SplitPanel">
+                            <Grid x:Name="PART_LayoutGrid">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="5"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <ContentPresenter Grid.Column="0"
+                                                  Content="{TemplateBinding Pane1Content}"/>
+
+                                <Grid x:Name="PART_Divider"
+                                      Grid.Column="1"
+                                      Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}">
+                                    <Rectangle Width="1"
+                                               HorizontalAlignment="Center"
+                                               Fill="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                </Grid>
+
+                                <ContentPresenter Grid.Column="2"
+                                                  Content="{TemplateBinding Pane2Content}"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+
+            <!-- ══ ToolbarButton ══════════════════════════════════════════════ -->
+            <Style TargetType="local:ToolbarButton">
+                <Setter Property="Width" Value="64"/>
+                <Setter Property="Padding" Value="6,8"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="local:ToolbarButton">
+                            <Border x:Name="RootBorder"
+                                    CornerRadius="4"
+                                    Padding="{TemplateBinding Padding}"
+                                    Background="Transparent">
+
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal"/>
+                                        <VisualState x:Name="PointerOver">
+                                            <VisualState.Setters>
+                                                <Setter Target="RootBorder.Background" Value="#1E3A5F"/>
+                                                <Setter Target="IconText.Foreground" Value="#93C5FD"/>
+                                                <Setter Target="LabelText.Foreground" Value="#93C5FD"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <VisualState.Setters>
+                                                <Setter Target="RootBorder.Background" Value="#1E40AF"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled">
+                                            <VisualState.Setters>
+                                                <Setter Target="RootBorder.Opacity" Value="0.35"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                    <VisualStateGroup x:Name="ActiveStates">
+                                        <VisualState x:Name="Inactive"/>
+                                        <VisualState x:Name="Active">
+                                            <VisualState.Setters>
+                                                <Setter Target="RootBorder.Background" Value="#1E40AF"/>
+                                                <Setter Target="IconText.Foreground" Value="White"/>
+                                                <Setter Target="LabelText.Foreground" Value="White"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+
+                                <StackPanel HorizontalAlignment="Center" Spacing="3">
+                                    <TextBlock x:Name="IconText"
+                                               Text="{TemplateBinding Icon}"
+                                               FontSize="18"
+                                               HorizontalAlignment="Center"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"/>
+                                    <TextBlock x:Name="LabelText"
+                                               Text="{TemplateBinding Label}"
+                                               FontSize="10"
+                                               HorizontalAlignment="Center"
+                                               Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"/>
+                                </StackPanel>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- ══ ToolbarButton ══════════════════════════════════════════════ -->
+            <Style TargetType="local:AsciiOutputControl">
+                <Setter Property="Background" Value="#020617"/>
+                <Setter Property="FontFamily" Value="Cascadia Code, Consolas, monospace"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="local:AsciiOutputControl">
+                            <Grid Background="{TemplateBinding Background}">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="DisplayStates">
+                                        <VisualState x:Name="Empty">
+                                            <VisualState.Setters>
+                                                <Setter Target="EmptyHint.Visibility" Value="Visible"/>
+                                                <Setter Target="OutputScroll.Visibility" Value="Collapsed"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Idle"/>
+                                        <VisualState x:Name="Converting">
+                                            <VisualState.Setters>
+                                                <Setter Target="ProgressOverlay.Visibility" Value="Visible"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Error">
+                                            <VisualState.Setters>
+                                                <Setter Target="ErrorPanel.Visibility" Value="Visible"/>
+                                                <Setter Target="OutputScroll.Visibility" Value="Collapsed"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+
+                                <ScrollViewer x:Name="OutputScroll"
+                                              HorizontalScrollBarVisibility="Auto"
+                                              VerticalScrollBarVisibility="Auto">
+                                    <ItemsControl x:Name="PART_ItemsControl"
+                                                  FontFamily="{TemplateBinding FontFamily}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:AsciiLine">
+                                                <local:AsciiLineControl Line="{Binding}"
+                                                                        OutputFontSize="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=OutputFontSize}"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                                <Border x:Name="ProgressOverlay"
+                                        Visibility="Collapsed"
+                                        Background="#C0020617">
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                                        <ProgressBar x:Name="PART_Progress"
+                                                     Width="240"
+                                                     Minimum="0" Maximum="100"/>
+                                        <TextBlock Text="Converting…"
+                                                   HorizontalAlignment="Center"
+                                                   Foreground="#64748B"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border x:Name="ErrorPanel"
+                                        Visibility="Collapsed"
+                                        Background="#C0200000">
+                                    <TextBlock x:Name="PART_ErrorText"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Foreground="#F87171"
+                                               TextWrapping="Wrap"
+                                               Margin="16"/>
+                                </Border>
+
+                                <Border x:Name="EmptyHint"
+                                        Visibility="Collapsed"
+                                        Background="#020617">
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                                        <TextBlock Text="No output yet"
+                                                   FontSize="14"
+                                                   Foreground="#1E3A5F"
+                                                   HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Open an image and click Convert"
+                                                   FontSize="12"
+                                                   Foreground="#1E293B"
+                                                   HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+
+            <!-- ══ CharacterSetPicker ════════════════════════════════════════ -->
+            <Style TargetType="local:CharacterSetPicker">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="local:CharacterSetPicker">
+                            <Grid x:Name="PART_Grid"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

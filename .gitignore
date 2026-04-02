@@ -43,3 +43,4 @@ publish/
 ## AI Assistants
 .claude/
 .superpowers/
+.gemini/

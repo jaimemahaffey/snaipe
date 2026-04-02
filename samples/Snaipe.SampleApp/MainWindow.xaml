@@ -23,20 +23,21 @@
                 BorderThickness="0,0,1,0"
                 BorderBrush="#1E293B">
             <StackPanel Spacing="12">
-                <controls:ToolbarButton Icon="📂" Label="Open"
-                                        PointerPressed="OnOpenClicked"/>
+                <controls:ToolbarButton x:Name="OpenButton"
+                                        Icon="📂" Label="Open"
+                                        Command="{Binding OpenImageCommand}"/>
                 <controls:ToolbarButton Icon="⚡" Label="Convert"
                                         IsActive="True"
-                                        PointerPressed="OnConvertClicked"/>
+                                        Command="{Binding ConvertCommand}"/>
                 <controls:ToolbarButton Icon="💾" Label="Export"
-                                        PointerPressed="OnExportClicked"/>
+                                        Command="{Binding ShowExportDialogCommand}"/>
                 <controls:ToolbarButton Icon="📋" Label="Copy"
-                                        PointerPressed="OnCopyClicked"/>
+                                        Command="{Binding CopyToClipboardCommand}"/>
                 <Border Height="1" Background="#1E293B" Margin="8,4"/>
                 <controls:ToolbarButton Icon="🔲" Label="Grid"
                                         PointerPressed="OnToggleGridClicked"/>
                 <controls:ToolbarButton Icon="📺" Label="Preview"
-                                        PointerPressed="OnTogglePreviewClicked"/>
+                                        Command="{Binding TogglePreviewWindowCommand}"/>
             </StackPanel>
         </Border>
 

@@ -40,7 +40,7 @@ public sealed class AsciiOutputControl : Control
 
     // ── Template parts ────────────────────────────────────────────────
 
-    private RichTextBlock? _richText;
+    private ItemsControl? _itemsControl;
     private ProgressBar? _progressBar;
     private TextBlock? _errorText;
 
@@ -52,9 +52,9 @@ public sealed class AsciiOutputControl : Control
     protected override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
-        _richText    = GetTemplateChild("PART_RichText")   as RichTextBlock;
-        _progressBar = GetTemplateChild("PART_Progress")   as ProgressBar;
-        _errorText   = GetTemplateChild("PART_ErrorText")  as TextBlock;
+        _itemsControl = GetTemplateChild("PART_ItemsControl") as ItemsControl;
+        _progressBar  = GetTemplateChild("PART_Progress")     as ProgressBar;
+        _errorText    = GetTemplateChild("PART_ErrorText")    as TextBlock;
         UpdateDisplayState();
         RenderDocument();
     }
@@ -85,23 +85,15 @@ public sealed class AsciiOutputControl : Control
 
     private void RenderDocument()
     {
-        if (_richText is null) return;
-        _richText.Blocks.Clear();
+        if (_itemsControl is null) return;
 
-        if (Document is not { Lines.Count: > 0 }) return;
-
-        foreach (var line in Document.Lines)
+        if (Document is not { Lines.Count: > 0 })
         {
-            var para = new Paragraph { LineStackingStrategy = LineStackingStrategy.BlockLineHeight };
-            foreach (var span in line.Spans)
-            {
-                var run = new Run { Text = span.Text, FontSize = OutputFontSize };
-                if (span.Color is { } color)
-                    run.Foreground = new SolidColorBrush(color);
-                para.Inlines.Add(run);
-            }
-            _richText.Blocks.Add(para);
+            _itemsControl.ItemsSource = null;
+            return;
         }
+
+        _itemsControl.ItemsSource = Document.Lines;
     }
 
     private void UpdateDisplayState()

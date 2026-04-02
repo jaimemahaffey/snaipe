@@ -19,9 +19,14 @@ public sealed class ToolbarButton : Control
         DependencyProperty.Register(nameof(IsActive), typeof(bool), typeof(ToolbarButton),
             new PropertyMetadata(false, OnIsActiveChanged));
 
+    public static readonly DependencyProperty CommandProperty =
+        DependencyProperty.Register(nameof(Command), typeof(System.Windows.Input.ICommand), typeof(ToolbarButton),
+            new PropertyMetadata(null));
+
     public string Icon  { get => (string)GetValue(IconProperty);  set => SetValue(IconProperty, value); }
     public string Label { get => (string)GetValue(LabelProperty); set => SetValue(LabelProperty, value); }
     public bool IsActive { get => (bool)GetValue(IsActiveProperty); set => SetValue(IsActiveProperty, value); }
+    public System.Windows.Input.ICommand? Command { get => (System.Windows.Input.ICommand?)GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
 
     public ToolbarButton()
     {
@@ -50,7 +55,14 @@ public sealed class ToolbarButton : Control
     protected override void OnPointerPressed(PointerRoutedEventArgs e)
     {
         base.OnPointerPressed(e);
-        if (IsEnabled) VisualStateManager.GoToState(this, "Pressed", true);
+        if (IsEnabled)
+        {
+            VisualStateManager.GoToState(this, "Pressed", true);
+            if (Command?.CanExecute(null) == true)
+            {
+                Command.Execute(null);
+            }
+        }
     }
 
     protected override void OnPointerReleased(PointerRoutedEventArgs e)

@@ -14,8 +14,8 @@ public static class Program
         {
             AppDomain.CurrentDomain.UnhandledException += (_, e) =>
             {
-                File.AppendAllText(logFile,
-                    $"[{DateTime.Now:HH:mm:ss.fff}] UNHANDLED: {e.ExceptionObject}\n");
+                var msg = $"[{DateTime.Now:HH:mm:ss.fff}] UNHANDLED: {e.ExceptionObject}\n";
+                File.AppendAllText(logFile, msg);
             };
 
             var host = UnoPlatformHostBuilder.Create()
@@ -28,8 +28,8 @@ public static class Program
         }
         catch (Exception ex)
         {
-            File.AppendAllText(logFile,
-                $"[{DateTime.Now:HH:mm:ss.fff}] FATAL: {ex}\n");
+            var msg = $"[{DateTime.Now:HH:mm:ss.fff}] FATAL: {ex}\n";
+            File.AppendAllText(logFile, msg);
             throw;
         }
     }

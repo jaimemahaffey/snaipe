@@ -23,7 +23,11 @@ public sealed class ShellViewModel : ViewModelBase, IDisposable
     public bool IsDocked         { get => _isDocked;       private set => SetField(ref _isDocked, value); }
     public string StatusMessage  { get => _statusMessage;  private set => SetField(ref _statusMessage, value); }
 
+    public IEnumerable<ColorMode> ColorModes => Enum.GetValues<ColorMode>();
+    public IEnumerable<DitheringAlgorithm> DitheringAlgs => Enum.GetValues<DitheringAlgorithm>();
+
     public AsyncRelayCommand   OpenImageCommand          { get; }
+    public AsyncRelayCommand   LoadImageDirectCommand    { get; }
     public RelayCommand        TogglePreviewWindowCommand { get; }
     public RelayCommand        ShowExportDialogCommand   { get; }
     public AsyncRelayCommand   ConvertCommand            { get; }
@@ -39,6 +43,7 @@ public sealed class ShellViewModel : ViewModelBase, IDisposable
         _dispatcher = dispatcher;
 
         OpenImageCommand = new AsyncRelayCommand(OpenImageAsync);
+        LoadImageDirectCommand = new AsyncRelayCommand(path => LoadImageDirectAsync((string)path!));
         ConvertCommand   = new AsyncRelayCommand(
             () => ConvertAsync(ImagePanel.FilePath, Settings.ToSettings()),
             () => !string.IsNullOrEmpty(ImagePanel.FilePath));
@@ -83,10 +88,15 @@ public sealed class ShellViewModel : ViewModelBase, IDisposable
         var file = await picker.PickSingleFileAsync();
         if (file is null) return;
 
-        await ImagePanel.LoadImageAsync(file.Path);
+        await LoadImageDirectAsync(file.Path);
+    }
+
+    public async Task LoadImageDirectAsync(string path)
+    {
+        await ImagePanel.LoadImageAsync(path);
         ConvertCommand.RaiseCanExecuteChanged();
-        StatusMessage = $"Loaded {System.IO.Path.GetFileName(file.Path)}";
-        await ConvertAsync(file.Path, Settings.ToSettings());
+        StatusMessage = $"Loaded {System.IO.Path.GetFileName(path)}";
+        await ConvertAsync(path, Settings.ToSettings());
     }
 
     public async Task ConvertAsync(string path, ConversionSettings settings)

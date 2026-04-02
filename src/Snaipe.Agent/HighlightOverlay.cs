@@ -122,7 +122,12 @@ public sealed class HighlightOverlay : IDisposable
     {
         if (_overlayCanvas is not null && _injectionPanel is not null)
         {
-            _injectionPanel.Children.Remove(_overlayCanvas);
+            var canvas = _overlayCanvas;
+            var panel = _injectionPanel;
+            _window.DispatcherQueue.TryEnqueue(() =>
+            {
+                panel.Children.Remove(canvas);
+            });
             _overlayCanvas = null;
             _highlightRect = null;
         }

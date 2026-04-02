@@ -1,6 +1,6 @@
 # ASCII Studio Sample App — Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Replace the minimal Snaipe sample app with ASCII Studio — a full-featured image-to-ASCII art converter that exercises every inspector feature.
 
@@ -1151,7 +1151,7 @@ dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows 
 
 Expected: succeeds.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add samples/Snaipe.SampleApp/Controls/
@@ -1326,7 +1326,7 @@ dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows 
 
 Expected: succeeds.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add samples/Snaipe.SampleApp/Controls/
@@ -1975,7 +1975,7 @@ git commit -m "feat(sample): add all ViewModels (Shell, ImagePanel, AsciiOutput,
 - Modify: `samples/Snaipe.SampleApp/MainWindow.xaml` — complete replacement
 - Modify: `samples/Snaipe.SampleApp/MainWindow.xaml.cs` — complete replacement
 
-- [ ] **Step 1: Replace MainWindow.xaml**
+- [x] **Step 1: Replace MainWindow.xaml**
 
 ```xml
 <!-- samples/Snaipe.SampleApp/MainWindow.xaml -->
@@ -2110,7 +2110,7 @@ git commit -m "feat(sample): add all ViewModels (Shell, ImagePanel, AsciiOutput,
 </Window>
 ```
 
-- [ ] **Step 2: Replace MainWindow.xaml.cs**
+- [x] **Step 2: Replace MainWindow.xaml.cs**
 
 ```csharp
 // samples/Snaipe.SampleApp/MainWindow.xaml.cs
@@ -2261,7 +2261,7 @@ public sealed partial class MainWindow : Window
 
 > **Note:** The last line in the constructor (`ImagePreview.ZoomLevelProperty.GetMetadata(...)`) is a dummy call that can be removed — it was a placeholder. Remove it if it causes a compile error.
 
-- [ ] **Step 3: Build to verify**
+- [x] **Step 3: Build to verify**
 
 ```bash
 dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows -v quiet
@@ -2269,7 +2269,7 @@ dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows 
 
 Expected: succeeds. Fix any namespace or type mismatches that appear.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add samples/Snaipe.SampleApp/MainWindow.xaml samples/Snaipe.SampleApp/MainWindow.xaml.cs
@@ -2284,7 +2284,7 @@ git commit -m "feat(sample): implement MainWindow with toolbar, SplitPanel, and 
 - Create: `samples/Snaipe.SampleApp/Windows/AsciiPreviewWindow.xaml`
 - Create: `samples/Snaipe.SampleApp/Windows/AsciiPreviewWindow.xaml.cs`
 
-- [ ] **Step 1: Create AsciiPreviewWindow.xaml**
+- [x] **Step 1: Create AsciiPreviewWindow.xaml**
 
 ```xml
 <!-- samples/Snaipe.SampleApp/Windows/AsciiPreviewWindow.xaml -->
@@ -2329,7 +2329,7 @@ git commit -m "feat(sample): implement MainWindow with toolbar, SplitPanel, and 
 </Window>
 ```
 
-- [ ] **Step 2: Create AsciiPreviewWindow.xaml.cs**
+- [x] **Step 2: Create AsciiPreviewWindow.xaml.cs**
 
 ```csharp
 // samples/Snaipe.SampleApp/Windows/AsciiPreviewWindow.xaml.cs
@@ -2402,7 +2402,7 @@ public sealed partial class AsciiPreviewWindow : Window
 }
 ```
 
-- [ ] **Step 3: Build to verify**
+- [x] **Step 3: Build to verify**
 
 ```bash
 dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows -v quiet
@@ -2410,7 +2410,7 @@ dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows 
 
 Expected: succeeds.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add samples/Snaipe.SampleApp/Windows/
@@ -2425,7 +2425,7 @@ git commit -m "feat(sample): add AsciiPreviewWindow (detachable float)"
 - Create: `samples/Snaipe.SampleApp/Dialogs/ExportDialog.xaml`
 - Create: `samples/Snaipe.SampleApp/Dialogs/ExportDialog.xaml.cs`
 
-- [ ] **Step 1: Create ExportDialog.xaml**
+- [x] **Step 1: Create ExportDialog.xaml**
 
 ```xml
 <!-- samples/Snaipe.SampleApp/Dialogs/ExportDialog.xaml -->
@@ -2470,7 +2470,7 @@ git commit -m "feat(sample): add AsciiPreviewWindow (detachable float)"
 </ContentDialog>
 ```
 
-- [ ] **Step 2: Create ExportDialog.xaml.cs**
+- [x] **Step 2: Create ExportDialog.xaml.cs**
 
 ```csharp
 // samples/Snaipe.SampleApp/Dialogs/ExportDialog.xaml.cs
@@ -2530,7 +2530,7 @@ public sealed partial class ExportDialog : ContentDialog
 >
 > This allows the dialog to await the operation cleanly.
 
-- [ ] **Step 3: Build final check**
+- [x] **Step 3: Build final check**
 
 ```bash
 dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows -v quiet
@@ -2538,7 +2538,7 @@ dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows 
 
 Expected: succeeds with no errors.
 
-- [ ] **Step 4: Run the app and verify manually**
+- [x] **Step 4: Run the app and verify manually**
 
 ```bash
 dotnet run --project samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows
@@ -2552,7 +2552,7 @@ Check:
 - Click "Export" → `ExportDialog` opens with format picker
 - Attach Snaipe Inspector → verify inspector can see both windows and deep control trees
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add samples/Snaipe.SampleApp/Dialogs/ samples/Snaipe.SampleApp/ViewModels/AsyncRelayCommand.cs
