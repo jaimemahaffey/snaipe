@@ -3,5 +3,64 @@
     x:Class="Snaipe.SampleApp.Controls.ImagePreviewControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid/>
+
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="PanStates">
+                <VisualState x:Name="NothingLoaded">
+                    <VisualState.Setters>
+                        <Setter Target="EmptyHint.Visibility" Value="Visible"/>
+                        <Setter Target="ImageScroll.Visibility" Value="Collapsed"/>
+                        <Setter Target="ZoomBadge.Visibility" Value="Collapsed"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Idle"/>
+                <VisualState x:Name="Panning"/>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <ScrollViewer x:Name="ImageScroll"
+                      ZoomMode="Enabled"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto"
+                      MinZoomFactor="0.1"
+                      MaxZoomFactor="8.0">
+            <Image x:Name="PreviewImage"
+                   Stretch="None"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"/>
+        </ScrollViewer>
+
+        <Border x:Name="EmptyHint"
+                Visibility="Collapsed"
+                Background="#0A1628">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                <TextBlock Text="🖼"
+                           FontSize="40"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="Drop an image here"
+                           FontSize="14"
+                           Foreground="#64748B"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="or click Open in the toolbar"
+                           FontSize="12"
+                           Foreground="#475569"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Zoom badge -->
+        <Border x:Name="ZoomBadge"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="8"
+                Background="#80000000"
+                CornerRadius="3"
+                Padding="6,2">
+            <TextBlock x:Name="ZoomLabel"
+                       FontSize="11"
+                       Foreground="#94A3B8"
+                       FontFamily="Cascadia Code, Consolas, monospace"/>
+        </Border>
+    </Grid>
 </UserControl>
