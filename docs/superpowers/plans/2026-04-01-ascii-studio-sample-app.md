@@ -51,13 +51,13 @@
 - Modify: `samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj`
 - Delete: `samples/Snaipe.SampleApp/SampleViewModel.cs`
 
-- [ ] **Step 1: Delete the old sample ViewModel**
+- [x] **Step 1: Delete the old sample ViewModel**
 
 ```bash
 rm samples/Snaipe.SampleApp/SampleViewModel.cs
 ```
 
-- [ ] **Step 2: Create directory structure**
+- [x] **Step 2: Create directory structure**
 
 ```bash
 mkdir -p samples/Snaipe.SampleApp/ViewModels
@@ -67,7 +67,7 @@ mkdir -p samples/Snaipe.SampleApp/Windows
 mkdir -p samples/Snaipe.SampleApp/Dialogs
 ```
 
-- [ ] **Step 3: Replace csproj**
+- [x] **Step 3: Replace csproj**
 
 ```xml
 <!-- samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -->
@@ -124,7 +124,7 @@ mkdir -p samples/Snaipe.SampleApp/Dialogs
 </Project>
 ```
 
-- [ ] **Step 4: Verify NuGet restore**
+- [x] **Step 4: Verify NuGet restore**
 
 ```bash
 dotnet restore samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj
@@ -132,7 +132,7 @@ dotnet restore samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj
 
 Expected: no errors, ImageSharp listed in output.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj
@@ -149,7 +149,7 @@ git commit -m "chore: scaffold ASCII Studio project structure"
 - Create: `samples/Snaipe.SampleApp/ViewModels/RelayCommand.cs`
 - Create: `samples/Snaipe.SampleApp/ViewModels/AsyncRelayCommand.cs`
 
-- [ ] **Step 1: Create ViewModelBase**
+- [x] **Step 1: Create ViewModelBase**
 
 ```csharp
 // samples/Snaipe.SampleApp/ViewModels/ViewModelBase.cs
@@ -175,7 +175,7 @@ public abstract class ViewModelBase : INotifyPropertyChanged
 }
 ```
 
-- [ ] **Step 2: Create RelayCommand**
+- [x] **Step 2: Create RelayCommand**
 
 ```csharp
 // samples/Snaipe.SampleApp/ViewModels/RelayCommand.cs
@@ -218,7 +218,7 @@ public sealed class RelayCommand<T> : ICommand
 }
 ```
 
-- [ ] **Step 3: Create AsyncRelayCommand**
+- [x] **Step 3: Create AsyncRelayCommand**
 
 ```csharp
 // samples/Snaipe.SampleApp/ViewModels/AsyncRelayCommand.cs
@@ -253,7 +253,7 @@ public sealed class AsyncRelayCommand : ICommand
 }
 ```
 
-- [ ] **Step 4: Build to verify**
+- [x] **Step 4: Build to verify**
 
 ```bash
 dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows -v quiet
@@ -261,7 +261,7 @@ dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows 
 
 Expected: build succeeds (will warn about missing MainWindow since we haven't replaced it yet — that's fine).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add samples/Snaipe.SampleApp/ViewModels/
@@ -277,7 +277,7 @@ git commit -m "feat(sample): add MVVM infrastructure (ViewModelBase, RelayComman
 - Create: `samples/Snaipe.SampleApp/ViewModels/AsciiDocument.cs`
 - Create: `samples/Snaipe.SampleApp/ViewModels/ConversionState.cs`
 
-- [ ] **Step 1: Create ConversionSettings**
+- [x] **Step 1: Create ConversionSettings**
 
 ```csharp
 // samples/Snaipe.SampleApp/ViewModels/ConversionSettings.cs
@@ -318,7 +318,7 @@ public sealed record ConversionSettings(
 }
 ```
 
-- [ ] **Step 2: Create AsciiDocument**
+- [x] **Step 2: Create AsciiDocument**
 
 ```csharp
 // samples/Snaipe.SampleApp/ViewModels/AsciiDocument.cs
@@ -341,7 +341,7 @@ public sealed record AsciiDocument(IReadOnlyList<AsciiLine> Lines)
 }
 ```
 
-- [ ] **Step 3: Create ConversionState**
+- [x] **Step 3: Create ConversionState**
 
 ```csharp
 // samples/Snaipe.SampleApp/ViewModels/ConversionState.cs
@@ -367,7 +367,7 @@ public sealed record ConversionState(
 }
 ```
 
-- [ ] **Step 4: Build to verify**
+- [x] **Step 4: Build to verify**
 
 ```bash
 dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows -v quiet
@@ -375,7 +375,7 @@ dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows 
 
 Expected: succeeds with no errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add samples/Snaipe.SampleApp/ViewModels/
@@ -392,7 +392,7 @@ git commit -m "feat(sample): add data models (ConversionSettings, AsciiDocument,
 
 `SplitPanel` is a `Control` subclass with a draggable divider. Template parts: `PART_LayoutGrid` (Grid), `PART_Divider` (Grid).
 
-- [ ] **Step 1: Create SplitPanel.cs**
+- [x] **Step 1: Create SplitPanel.cs**
 
 ```csharp
 // samples/Snaipe.SampleApp/Controls/SplitPanel.cs
@@ -496,7 +496,7 @@ public sealed class SplitPanel : Control
 }
 ```
 
-- [ ] **Step 2: Create Generic.xaml with SplitPanel style**
+- [x] **Step 2: Create Generic.xaml with SplitPanel style**
 
 ```xml
 <!-- samples/Snaipe.SampleApp/Controls/Themes/Generic.xaml -->
@@ -539,7 +539,7 @@ public sealed class SplitPanel : Control
 </ResourceDictionary>
 ```
 
-- [ ] **Step 3: Merge Generic.xaml in App.cs**
+- [x] **Step 3: Merge Generic.xaml in App.cs**
 
 Open `samples/Snaipe.SampleApp/App.cs` and add the merged dictionary after the XamlControlsResources line:
 
@@ -573,7 +573,7 @@ public class App : Application
 }
 ```
 
-- [ ] **Step 4: Build to verify**
+- [x] **Step 4: Build to verify**
 
 ```bash
 dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows -v quiet
@@ -581,7 +581,7 @@ dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows 
 
 Expected: succeeds.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add samples/Snaipe.SampleApp/Controls/ samples/Snaipe.SampleApp/App.cs
@@ -598,7 +598,7 @@ git commit -m "feat(sample): add SplitPanel custom control with drag-to-resize"
 
 `ToolbarButton` is a `Control` with two visual state groups: `CommonStates` (Normal/PointerOver/Pressed/Disabled) and `ActiveStates` (Inactive/Active).
 
-- [ ] **Step 1: Create ToolbarButton.cs**
+- [x] **Step 1: Create ToolbarButton.cs**
 
 ```csharp
 // samples/Snaipe.SampleApp/Controls/ToolbarButton.cs
@@ -670,7 +670,7 @@ public sealed class ToolbarButton : Control
 }
 ```
 
-- [ ] **Step 2: Append ToolbarButton style to Generic.xaml**
+- [x] **Step 2: Append ToolbarButton style to Generic.xaml**
 
 Add this block inside the `<ResourceDictionary>` after the SplitPanel style:
 
@@ -739,7 +739,7 @@ Add this block inside the `<ResourceDictionary>` after the SplitPanel style:
     </Style>
 ```
 
-- [ ] **Step 3: Build to verify**
+- [x] **Step 3: Build to verify**
 
 ```bash
 dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows -v quiet
@@ -747,7 +747,7 @@ dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows 
 
 Expected: succeeds.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add samples/Snaipe.SampleApp/Controls/
@@ -764,7 +764,7 @@ git commit -m "feat(sample): add ToolbarButton control with CommonStates and Act
 
 `ImagePreviewControl` is a `UserControl` wrapping a `ScrollViewer`. Custom DPs: `Source` (ImageSource), `ZoomLevel` (double). Visual states: `PanStates` group — Idle, Panning, NothingLoaded.
 
-- [ ] **Step 1: Create ImagePreviewControl.xaml**
+- [x] **Step 1: Create ImagePreviewControl.xaml**
 
 ```xml
 <!-- samples/Snaipe.SampleApp/Controls/ImagePreviewControl.xaml -->
@@ -841,7 +841,7 @@ git commit -m "feat(sample): add ToolbarButton control with CommonStates and Act
 </UserControl>
 ```
 
-- [ ] **Step 2: Create ImagePreviewControl.xaml.cs**
+- [x] **Step 2: Create ImagePreviewControl.xaml.cs**
 
 ```csharp
 // samples/Snaipe.SampleApp/Controls/ImagePreviewControl.xaml.cs
@@ -904,7 +904,7 @@ public sealed partial class ImagePreviewControl : UserControl
 }
 ```
 
-- [ ] **Step 3: Build to verify**
+- [x] **Step 3: Build to verify**
 
 ```bash
 dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows -v quiet
@@ -912,7 +912,7 @@ dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows 
 
 Expected: succeeds.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add samples/Snaipe.SampleApp/Controls/
@@ -929,7 +929,7 @@ git commit -m "feat(sample): add ImagePreviewControl with zoom and NothingLoaded
 
 `AsciiOutputControl` is a `Control` that renders `AsciiDocument` as a `RichTextBlock` with colored `Run` elements. Visual states: `DisplayStates` group — Empty, Idle, Converting, Error.
 
-- [ ] **Step 1: Create AsciiOutputControl.cs**
+- [x] **Step 1: Create AsciiOutputControl.cs**
 
 ```csharp
 // samples/Snaipe.SampleApp/Controls/AsciiOutputControl.cs
@@ -1054,7 +1054,7 @@ public sealed class AsciiOutputControl : Control
 }
 ```
 
-- [ ] **Step 2: Append AsciiOutputControl style to Generic.xaml**
+- [x] **Step 2: Append AsciiOutputControl style to Generic.xaml**
 
 Add after the ToolbarButton style block:
 
@@ -1143,7 +1143,7 @@ Add after the ToolbarButton style block:
     </Style>
 ```
 
-- [ ] **Step 3: Build to verify**
+- [x] **Step 3: Build to verify**
 
 ```bash
 dotnet build samples/Snaipe.SampleApp/Snaipe.SampleApp.csproj -f net9.0-windows -v quiet

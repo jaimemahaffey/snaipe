@@ -52,9 +52,9 @@ public sealed class AsciiOutputControl : Control
     protected override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
-        _richText    = GetTemplateChild("PART_RichText")  as RichTextBlock;
-        _progressBar = GetTemplateChild("PART_Progress")  as ProgressBar;
-        _errorText   = GetTemplateChild("PART_ErrorText") as TextBlock;
+        _richText    = GetTemplateChild("PART_RichText")   as RichTextBlock;
+        _progressBar = GetTemplateChild("PART_Progress")   as ProgressBar;
+        _errorText   = GetTemplateChild("PART_ErrorText")  as TextBlock;
         UpdateDisplayState();
         RenderDocument();
     }
