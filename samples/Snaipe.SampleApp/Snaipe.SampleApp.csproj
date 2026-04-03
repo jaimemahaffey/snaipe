@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Snaipe.Agent\Snaipe.Agent.csproj" />
+    <PackageReference Include="Snaipe.Agent" Version="1.0.0-local" />
   </ItemGroup>
 
   <ItemGroup>
