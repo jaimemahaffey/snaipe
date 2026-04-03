@@ -28,19 +28,12 @@
 
   <!-- Bundle Snaipe.Protocol.dll into this package (private implementation detail) -->
   <PropertyGroup>
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);BundleProtocol</TargetsForTfmSpecificContentInPackage>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);BundleProtocol</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
-  <Target Name="BundleProtocol" DependsOnTargets="ResolveAssemblyReferences">
-    <GetNuGetShortFolderName
-      TargetFrameworkMoniker="$(TargetFrameworkMoniker)"
-      TargetPlatformMoniker="$(TargetPlatformMoniker)">
-      <Output TaskParameter="NuGetShortFolderName" PropertyName="_BundleProtocolLibFolder" />
-    </GetNuGetShortFolderName>
+  <Target Name="BundleProtocol" DependsOnTargets="ResolveReferences">
     <ItemGroup>
-      <TfmSpecificPackageFile Include="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'Snaipe.Protocol' and '%(Extension)' == '.dll'">
-        <PackagePath>lib/$(_BundleProtocolLibFolder)</PackagePath>
-      </TfmSpecificPackageFile>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'Snaipe.Protocol' and '%(Extension)' == '.dll'" />
     </ItemGroup>
   </Target>
 
