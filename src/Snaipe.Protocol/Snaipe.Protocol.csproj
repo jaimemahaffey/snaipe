@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>Snaipe.Protocol</RootNamespace>
     <Description>Shared models and communication contract for Snaipe inspector</Description>
   </PropertyGroup>
