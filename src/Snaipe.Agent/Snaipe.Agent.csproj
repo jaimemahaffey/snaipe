@@ -31,7 +31,7 @@
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);BundleProtocol</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
-  <Target Name="BundleProtocol" DependsOnTargets="ResolveAssemblyReferences" Returns="@(TfmSpecificPackageFile)">
+  <Target Name="BundleProtocol" DependsOnTargets="ResolveAssemblyReferences">
     <GetNuGetShortFolderName
       TargetFrameworkMoniker="$(TargetFrameworkMoniker)"
       TargetPlatformMoniker="$(TargetPlatformMoniker)">
