@@ -23,11 +23,14 @@ jobs:
         shell: bash
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
+      - name: Build Solution
+        run: dotnet build Snaipe.sln -c Release
+
       - name: Pack Snaipe.Agent
-        run: dotnet pack src/Snaipe.Agent/Snaipe.Agent.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} -o ./nupkg
+        run: dotnet pack src/Snaipe.Agent/Snaipe.Agent.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkg
 
       - name: Pack Snaipe (Inspector tool)
-        run: dotnet pack src/Snaipe.Inspector/Snaipe.Inspector.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} -f net9.0-windows -o ./nupkg
+        run: dotnet pack src/Snaipe.Inspector/Snaipe.Inspector.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkg
 
       - name: Push to GitHub Packages
         run: dotnet nuget push ./nupkg/*.nupkg --source github --api-key ${{ secrets.GITHUB_TOKEN }}
