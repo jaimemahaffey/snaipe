@@ -1,3 +1,23 @@
+# README Overhaul & Showcase Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Overhaul `README.md` to be a visual showcase of Snaipe's current capabilities, using a tool-by-tool structure.
+
+**Architecture:** Use high-impact Markdown with placeholders for screenshots. Organize into distinct sections for each core tool (Tree Explorer, DataContext, Property Editor, Pick Mode).
+
+**Tech Stack:** Markdown, Mermaid.
+
+---
+
+### Task 1: Overhaul README Structure
+
+**Files:**
+- Modify: `README.md`
+
+- [ ] **Step 1: Rewrite the README with the new structure**
+
+```markdown
 # Snaipe
 
 The visual tree inspector for [Uno Platform](https://platform.uno/) Desktop.
@@ -78,3 +98,33 @@ Active development / functional prototype.
 
 ## License
 MIT
+```
+
+- [ ] **Step 2: Commit the changes**
+
+```bash
+git add README.md
+git commit -m "docs: overhaul README into a visual showcase"
+```
+
+---
+
+### Task 2: Create Screenshot Directory
+
+**Files:**
+- Create: `docs/screenshots/.gitkeep`
+
+- [ ] **Step 1: Create the directory for screenshots**
+
+Run: `mkdir -p docs/screenshots`
+
+- [ ] **Step 2: Add a .gitkeep file to ensure the directory is tracked**
+
+Run: `New-Item -Path docs/screenshots\.gitkeep -ItemType File`
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add docs/screenshots/.gitkeep
+git commit -m "docs: create screenshots directory"
+```
