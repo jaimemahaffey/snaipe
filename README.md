@@ -1,52 +1,80 @@
 # Snaipe
 
-A cross-platform visual tree inspector for [Uno Platform](https://platform.uno/) desktop applications using the Skia renderer. Think [Snoop WPF](https://github.com/snoopwpf/snoopwpf) or [WPF Inspector](https://wpfinspector.codeplex.com/), but for Uno Desktop targets on Windows and Linux.
+The visual tree inspector for [Uno Platform](https://platform.uno/) Desktop.
 
-## Goals
+![Hero Screenshot](docs/screenshots/hero.png)
 
-- **Visual tree inspection** — browse the live UI element tree of a running Uno Skia Desktop app
-- **Property viewer** — inspect and live-edit dependency properties, attached properties, and bindings
-- **Element highlighting** — hover an element in the tree to highlight it in the running app (and vice-versa: pick from the app to locate in the tree)
-- **Cross-platform** — works on both Windows and Linux (the two Uno Skia Desktop targets)
-- **Low intrusion** — inject or attach to a running process with minimal impact on the target app
+Snaipe is a cross-platform debugging tool for Uno developers. Inspect trees, edit properties, and debug bindings in real-time on Windows and Linux. Think [Snoop WPF](https://github.com/snoopwpf/snoopwpf) or [WPF Inspector](https://wpfinspector.codeplex.com/), but for Uno Desktop targets using the Skia renderer.
 
-## Architecture (planned)
+## 🔍 Visual Tree Explorer
+Browse the live UI element hierarchy of any running Uno Skia Desktop app. Easily navigate complex trees and search for specific elements.
 
+![Tree Explorer Screenshot](docs/screenshots/tree-explorer.png)
+
+## 🧩 DataContext Drilldown
+Inspect the live ViewModel and data bindings for any element in the tree. Reveal the source of your data instantly.
+
+![DataContext Drilldown Screenshot](docs/screenshots/datacontext.png)
+
+> **Pro Tip:** Debug binding issues in seconds by seeing the live state of your ViewModel directly in the inspector.
+
+## 🎨 Live Property Editor
+Inspect and edit dependency properties, attached properties, and bindings in real-time. See your changes reflected instantly in the running app.
+
+![Property Editor Screenshot](docs/screenshots/property-editor.png)
+
+## 🎯 Pick Mode
+Point and click on any element in your application to automatically locate and select it within the Snaipe inspector.
+
+![Pick Mode Screenshot](docs/screenshots/pick-mode.png)
+
+## 🚀 Quick Start
+
+### 1. Install the Agent
+Add the `Snaipe.Agent` NuGet package to your Uno Platform Desktop project:
+
+```bash
+dotnet add package Snaipe.Agent
 ```
-┌─────────────────────┐         ┌──────────────────────┐
-│   Snaipe Inspector   │  TCP/  │   Target Uno App      │
-│   (standalone app)   │◄──────►│   + Snaipe.Agent      │
-│   Uno Skia Desktop   │  pipe  │   (injected library)  │
-└─────────────────────┘         └──────────────────────┘
+
+### 2. Attach the Agent
+In your `App.xaml.cs` (or wherever you initialize your main window), attach the Snaipe agent:
+
+```csharp
+protected override void OnLaunched(LaunchActivatedEventArgs args)
+{
+    var window = new MainWindow();
+    window.Activate();
+
+    // Attach Snaipe Agent to the window
+    Snaipe.Agent.SnaipeAgent.Attach(window);
+}
 ```
 
-**Snaipe.Agent** — a small library referenced by (or injected into) the target app. Walks the Uno visual tree via `Microsoft.UI.Xaml.VisualTreeHelper`, serializes the tree and property data, and listens for commands (highlight, set property, etc.).
+### 3. Run the Inspector
+Run the `Snaipe.Inspector` application to start debugging.
 
-**Snaipe.Inspector** — a standalone Uno Skia Desktop app that connects to the agent, renders the tree view, property grid, and preview pane.
+## 🏗️ Architecture
 
-**Snaipe.Protocol** — shared DTOs and communication contract between agent and inspector.
-
-## Tech Stack
-
-- .NET 9
-- Uno Platform 6.x (Skia Desktop — Gtk / X11 / Framebuffer)
-- System.IO.Pipelines / named pipes or TCP for IPC
-
-## Project Structure
-
+```mermaid
+graph LR
+    subgraph "Target App"
+        A[Uno UI] --- B[Snaipe.Agent]
+    end
+    B <--- "Protocol (TCP/Pipes)" ---> C[Snaipe.Inspector]
 ```
-src/
-  Snaipe.Agent/          # Library injected into / referenced by target app
-  Snaipe.Inspector/      # Standalone inspector UI (Uno Skia Desktop)
-  Snaipe.Protocol/       # Shared models and serialization
-samples/
-  Snaipe.SampleApp/      # Minimal Uno app for testing the inspector
-```
+
+- **Snaipe.Agent:** A small library that walks the Uno visual tree and listens for commands.
+- **Snaipe.Inspector:** A standalone Uno app that connects to the agent and renders the debugging UI.
+- **Snaipe.Protocol:** Shared models and serialization contract.
+
+## 🛠️ Tech Stack
+- **.NET 9**
+- **Uno Platform 6.x** (Skia Desktop)
+- **System.IO.Pipelines** for high-performance IPC
 
 ## Status
-
-Early exploration / proof of concept.
+Active development / functional prototype.
 
 ## License
-
 MIT
