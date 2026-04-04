@@ -24,6 +24,34 @@ public class PropertyGridViewModelTests
     }
 
     [Fact]
+    public void Load_PopulatesFilteredProperties()
+    {
+        var grid = new PropertyGridViewModel();
+        var row = MakeRowWithChain("Background");
+        grid.Load(new[] { row });
+
+        Assert.Single(grid.FilteredProperties); // 1 group
+        Assert.Single(grid.FilteredProperties[0]); // 1 item
+    }
+
+    [Fact]
+    public void SearchText_FiltersOnName_CaseInsensitive()
+    {
+        var grid = new PropertyGridViewModel();
+        grid.Load(new[] { MakeRowWithChain("Background"), MakeRowWithChain("Foreground") });
+
+        grid.SearchText = "ground";
+        Assert.Single(grid.FilteredProperties); // Both in "Appearance" group
+        Assert.Equal(2, grid.FilteredProperties[0].Count);
+
+        grid.SearchText = "back";
+        Assert.Single(grid.FilteredProperties);
+        Assert.Single(grid.FilteredProperties[0]);
+        var first = grid.FilteredProperties[0][0];
+        Assert.Equal("Background", first.Entry.Name);
+    }
+
+    [Fact]
     public void ShowValueChain_SetsActiveChain()
     {
         var grid = new PropertyGridViewModel();

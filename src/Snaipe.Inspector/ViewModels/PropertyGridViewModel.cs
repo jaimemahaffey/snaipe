@@ -2,24 +2,32 @@ using System.Collections.ObjectModel;
 
 namespace Snaipe.Inspector.ViewModels;
 
+public class PropertyCategoryGroup : ObservableCollection<PropertyRowViewModel>
+{
+    public string Key { get; }
+    public PropertyCategoryGroup(string key, IEnumerable<PropertyRowViewModel> items) : base(items)
+    {
+        Key = key;
+    }
+}
+
 public sealed class PropertyGridViewModel : ViewModelBase
 {
     private List<PropertyRowViewModel> _allProperties = [];
     private string _searchText = "";
     private string _activeSortColumn = "Category";
     private bool _sortAscending = true;
-
+    
     private PropertyRowViewModel? _activeChainRow;
     private ValueChainEntryViewModel[]? _activeValueChain;
     private string? _valueChainPropertyName;
 
     public PropertyGridViewModel()
     {
-        SortByCommand = new RelayCommand<string>(SortBy);
         ClearValueChainCommand = new RelayCommand(ClearValueChain);
     }
 
-    public ObservableCollection<PropertyRowViewModel> FilteredProperties { get; } = [];
+    public ObservableCollection<PropertyCategoryGroup> FilteredProperties { get; } = [];
 
     public string SearchText
     {
@@ -31,10 +39,6 @@ public sealed class PropertyGridViewModel : ViewModelBase
         }
     }
 
-    public string ActiveSortColumn => _activeSortColumn;
-    public bool SortAscending => _sortAscending;
-
-    public RelayCommand<string> SortByCommand { get; }
     public RelayCommand ClearValueChainCommand { get; }
 
     public ValueChainEntryViewModel[]? ActiveValueChain
@@ -58,15 +62,10 @@ public sealed class PropertyGridViewModel : ViewModelBase
             ? Microsoft.UI.Xaml.Visibility.Visible
             : Microsoft.UI.Xaml.Visibility.Collapsed;
 
-    /// <summary>
-    /// Shows the value chain panel for <paramref name="row"/>. Calling with the same row
-    /// a second time toggles the panel off.
-    /// </summary>
     public void ShowValueChain(PropertyRowViewModel row)
     {
         if (row.ValueChain is null) return;
 
-        // Toggle: clicking same row again closes panel
         if (ReferenceEquals(_activeChainRow, row) && ActiveValueChain is not null)
         {
             ClearValueChain();
@@ -78,18 +77,12 @@ public sealed class PropertyGridViewModel : ViewModelBase
         ValueChainPropertyName = $"{row.Entry.Name} — value chain";
     }
 
-    /// <summary>Hides the value chain panel.</summary>
     public void ClearValueChain()
     {
         _activeChainRow = null;
         ActiveValueChain = null;
         ValueChainPropertyName = null;
     }
-
-    public string NameColumnHeader     => "NAME"     + SortIndicator("Name");
-    public string TypeColumnHeader     => "TYPE"     + SortIndicator("Type");
-    public string CategoryColumnHeader => "CATEGORY" + SortIndicator("Category");
-    public string ReadOnlyColumnHeader => "R/O"      + SortIndicator("ReadOnly");
 
     public void Load(IEnumerable<PropertyRowViewModel> rows)
     {
@@ -99,28 +92,9 @@ public sealed class PropertyGridViewModel : ViewModelBase
 
     public void Clear()
     {
-        _allProperties = [];
+        _allProperties.Clear();
         FilteredProperties.Clear();
         ClearValueChain();
-    }
-
-    private void SortBy(string? column)
-    {
-        if (column is null) return;
-        if (_activeSortColumn == column)
-            _sortAscending = !_sortAscending;
-        else
-        {
-            _activeSortColumn = column;
-            _sortAscending = true;
-        }
-        OnPropertyChanged(nameof(ActiveSortColumn));
-        OnPropertyChanged(nameof(SortAscending));
-        OnPropertyChanged(nameof(NameColumnHeader));
-        OnPropertyChanged(nameof(TypeColumnHeader));
-        OnPropertyChanged(nameof(CategoryColumnHeader));
-        OnPropertyChanged(nameof(ReadOnlyColumnHeader));
-        RebuildFilteredProperties();
     }
 
     private void RebuildFilteredProperties()
@@ -140,15 +114,14 @@ public sealed class PropertyGridViewModel : ViewModelBase
                           : rows.OrderByDescending(r => CategoryOrder(r.Entry.Category)).ThenBy(r => r.Entry.Name),
         };
 
-        FilteredProperties.Clear();
-        foreach (var row in sorted)
-            FilteredProperties.Add(row);
-    }
+        var grouped = sorted.GroupBy(r => r.Entry.Category ?? "Other")
+                            .OrderBy(g => CategoryOrder(g.Key));
 
-    private string SortIndicator(string column)
-    {
-        if (_activeSortColumn != column) return "";
-        return _sortAscending ? " ↑" : " ↓";
+        FilteredProperties.Clear();
+        foreach (var group in grouped)
+        {
+            FilteredProperties.Add(new PropertyCategoryGroup(group.Key, group));
+        }
     }
 
     private static int CategoryOrder(string category) => category switch
