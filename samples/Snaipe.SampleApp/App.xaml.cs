@@ -16,6 +16,12 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         var window = new MainWindow();
+        window.Title = "ASCII Studio (Snaipe Sample)";
+        
+#if HAS_UNO_SKIA
+        window.AppWindow.SetIcon("icon.ico");
+#endif
+
         window.Activate();
         _agent = SnaipeAgent.Attach(window);
 

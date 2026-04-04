@@ -3,62 +3,106 @@
     x:Class="Snaipe.Inspector.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Snaipe.Inspector.Controls">
+    xmlns:controls="using:Snaipe.Inspector.Controls"
+    xmlns:utu="http://uno.ui/toolkit"
+    xmlns:ctk="using:CommunityToolkit.WinUI.Controls">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid Background="{StaticResource MainBackgroundGradient}">
+        <Grid.Resources>
+            <LinearGradientBrush x:Key="MainBackgroundGradient" StartPoint="0.5,0" EndPoint="0.5,1">
+                <GradientStop Color="{ThemeResource SystemAltHighColor}" Offset="0.0"/>
+                <GradientStop Color="{ThemeResource SystemAltLowColor}" Offset="1.0"/>
+            </LinearGradientBrush>
+        </Grid.Resources>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Connection bar -->
-        <controls:ConnectionBarControl Grid.Row="0"/>
+        <!-- Top Header & Connection Bar -->
+        <Border Grid.Row="0" 
+                Padding="12,8"
+                BorderThickness="0,0,0,1"
+                BorderBrush="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
+                Background="{ThemeResource SystemControlBackgroundChromeLowBrush}">
+            <controls:ConnectionBarControl />
+        </Border>
 
-        <!-- Main split: tree | property+preview -->
-        <Grid Grid.Row="1">
+        <!-- Main split: tree | properties | preview -->
+        <Grid Grid.Row="1" Padding="12">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300" MinWidth="150"/>
+                <ColumnDefinition Width="280" MinWidth="200"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*" MinWidth="200"/>
+                <ColumnDefinition Width="*" MinWidth="300"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="320" MinWidth="200"/>
             </Grid.ColumnDefinitions>
 
-            <controls:ElementTreeControl Grid.Column="0"/>
+            <!-- Visual Tree Pane (Left) -->
+            <Border Grid.Column="0"
+                    BorderThickness="1"
+                    BorderBrush="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
+                    CornerRadius="6"
+                    Background="{ThemeResource SystemControlBackgroundAltHighBrush}"
+                    Margin="4">
+                <controls:ElementTreeControl />
+            </Border>
 
-            <Border Grid.Column="1"
-                    Width="4"
-                    Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"/>
+            <!-- Vertical Splitter 1 -->
+            <ctk:GridSplitter Grid.Column="1"
+                             Width="8"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Stretch"
+                             ResizeBehavior="BasedOnAlignment"
+                             ResizeDirection="Columns"
+                             Background="Transparent"/>
 
-            <!-- Right pane: property grid over preview -->
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="160" MinHeight="80"/>
-                </Grid.RowDefinitions>
+            <!-- Properties Pane (Middle) -->
+            <Border Grid.Column="2"
+                    BorderThickness="1"
+                    BorderBrush="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
+                    CornerRadius="6"
+                    Background="{ThemeResource SystemControlBackgroundAltHighBrush}"
+                    Margin="4">
+                <controls:PropertyGridControl DataContext="{x:Bind ViewModel.PropertyGrid}"
+                                                Host="{x:Bind ViewModel}"/>
+            </Border>
 
-                <controls:PropertyGridControl Grid.Row="0"
-                               DataContext="{x:Bind ViewModel.PropertyGrid}"
-                               Host="{x:Bind ViewModel}"/>
+            <!-- Vertical Splitter 2 -->
+            <ctk:GridSplitter Grid.Column="3"
+                             Width="8"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Stretch"
+                             ResizeBehavior="BasedOnAlignment"
+                             ResizeDirection="Columns"
+                             Background="Transparent"/>
 
-                <Border Grid.Row="1"
-                        Height="4"
-                        Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"/>
-
-                <controls:PreviewPaneControl Grid.Row="2"/>
-            </Grid>
+            <!-- Preview Pane (Right) -->
+            <Border Grid.Column="4"
+                    BorderThickness="1"
+                    BorderBrush="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
+                    CornerRadius="6"
+                    Background="{ThemeResource SystemControlBackgroundAltHighBrush}"
+                    Margin="4">
+                <controls:PreviewPaneControl />
+            </Border>
         </Grid>
 
         <!-- Status bar -->
-        <Border Grid.Row="2" Padding="8,4">
-            <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
-                       Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}"
-                       FontSize="12"
-                       TextTrimming="CharacterEllipsis"/>
+        <Border Grid.Row="2" 
+                Padding="12,6"
+                BorderThickness="0,1,0,0"
+                BorderBrush="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
+                Background="{ThemeResource SystemControlBackgroundChromeLowBrush}">
+            <StackPanel Orientation="Horizontal" Spacing="16">
+                <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                           FontSize="12"
+                           VerticalAlignment="Center"
+                           FontFamily="Cascadia Code, Consolas"/>
+            </StackPanel>
         </Border>
     </Grid>
 </Window>
