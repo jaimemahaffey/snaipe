@@ -20,7 +20,7 @@
 
             <local:PropertyEditorTemplateSelector.TextTemplate>
                 <DataTemplate x:DataType="vm:PropertyRowViewModel">
-                    <TextBox Text="{x:Bind EditValue, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                    <TextBox Text="{x:Bind EditValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              FontSize="12"
                              BorderBrush="{x:Bind ErrorBorderBrush, Mode=OneWay}"
                              BorderThickness="1"

@@ -22,11 +22,19 @@
   <ItemGroup>
     <PackageReference Include="Uno.WinUI" Version="6.5.153" />
     <PackageReference Include="Uno.WinUI.Skia.X11" Version="6.5.153" />
+    <PackageReference Include="Uno.WinUI.Lottie" Version="6.5.153" />
+    <PackageReference Include="SkiaSharp.Views.Uno.WinUI" Version="3.119.0" />
+    <PackageReference Include="SkiaSharp.Skottie" Version="3.119.0" />
   </ItemGroup>
 
   <!-- Windows-only: native Win32 Skia host (Uno 6+) -->
   <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
     <PackageReference Include="Uno.WinUI.Runtime.Skia.Win32" Version="6.5.153" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Uno.Toolkit.WinUI" Version="6.0.24" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.1.240916" />
   </ItemGroup>
 
   <!-- XAML pages and controls -->
