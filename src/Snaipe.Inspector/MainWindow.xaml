@@ -23,87 +23,83 @@
 
         <!-- Top Header & Connection Bar -->
         <Border Grid.Row="0" 
-                Padding="8"
+                Padding="12,8"
                 BorderThickness="0,0,0,1"
                 BorderBrush="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
                 Background="{ThemeResource SystemControlBackgroundChromeLowBrush}">
             <controls:ConnectionBarControl />
         </Border>
 
-        <!-- Main split: tree | property+preview -->
+        <!-- Main split: tree | properties | preview -->
         <Grid Grid.Row="1" Padding="12">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="320" MinWidth="200"/>
+                <ColumnDefinition Width="280" MinWidth="200"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*" MinWidth="400"/>
+                <ColumnDefinition Width="*" MinWidth="300"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="320" MinWidth="200"/>
             </Grid.ColumnDefinitions>
 
             <!-- Visual Tree Pane (Left) -->
             <Border Grid.Column="0"
                     BorderThickness="1"
                     BorderBrush="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
-                    CornerRadius="12"
-                    Background="{ThemeResource SystemControlBackgroundAltHighBrush}">
+                    CornerRadius="6"
+                    Background="{ThemeResource SystemControlBackgroundAltHighBrush}"
+                    Margin="4">
                 <controls:ElementTreeControl />
             </Border>
 
-            <!-- Vertical Splitter -->
+            <!-- Vertical Splitter 1 -->
             <ctk:GridSplitter Grid.Column="1"
-                             Width="1"
+                             Width="8"
                              HorizontalAlignment="Center"
                              VerticalAlignment="Stretch"
                              ResizeBehavior="BasedOnAlignment"
                              ResizeDirection="Columns"
-                             Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}"/>
+                             Background="Transparent"/>
 
-            <!-- Right pane: property grid over preview -->
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="240" MinHeight="100"/>
-                </Grid.RowDefinitions>
+            <!-- Properties Pane (Middle) -->
+            <Border Grid.Column="2"
+                    BorderThickness="1"
+                    BorderBrush="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
+                    CornerRadius="6"
+                    Background="{ThemeResource SystemControlBackgroundAltHighBrush}"
+                    Margin="4">
+                <controls:PropertyGridControl DataContext="{x:Bind ViewModel.PropertyGrid}"
+                                                Host="{x:Bind ViewModel}"/>
+            </Border>
 
-                <!-- Properties Pane (Top-Right) -->
-                <Border Grid.Row="0"
-                        BorderThickness="1"
-                        BorderBrush="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
-                        CornerRadius="12"
-                        Background="{ThemeResource SystemControlBackgroundAltHighBrush}">
-                    <controls:PropertyGridControl DataContext="{x:Bind ViewModel.PropertyGrid}"
-                                                    Host="{x:Bind ViewModel}"/>
-                </Border>
+            <!-- Vertical Splitter 2 -->
+            <ctk:GridSplitter Grid.Column="3"
+                             Width="8"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Stretch"
+                             ResizeBehavior="BasedOnAlignment"
+                             ResizeDirection="Columns"
+                             Background="Transparent"/>
 
-                <!-- Horizontal Splitter -->
-                <ctk:GridSplitter Grid.Row="1"
-                                 Height="1"
-                                 HorizontalAlignment="Stretch"
-                                 VerticalAlignment="Center"
-                                 ResizeBehavior="BasedOnAlignment"
-                                 ResizeDirection="Rows"
-                                 Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}"/>
-
-                <!-- Preview Pane (Bottom-Right) -->
-                <Border Grid.Row="2"
-                        BorderThickness="1"
-                        BorderBrush="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
-                        CornerRadius="12"
-                        Background="{ThemeResource SystemControlBackgroundAltHighBrush}">
-                    <controls:PreviewPaneControl />
-                </Border>
-            </Grid>
+            <!-- Preview Pane (Right) -->
+            <Border Grid.Column="4"
+                    BorderThickness="1"
+                    BorderBrush="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
+                    CornerRadius="6"
+                    Background="{ThemeResource SystemControlBackgroundAltHighBrush}"
+                    Margin="4">
+                <controls:PreviewPaneControl />
+            </Border>
         </Grid>
 
         <!-- Status bar -->
         <Border Grid.Row="2" 
-                Padding="16,8"
+                Padding="12,6"
                 BorderThickness="0,1,0,0"
                 BorderBrush="{ThemeResource SystemControlBackgroundChromeMediumBrush}"
                 Background="{ThemeResource SystemControlBackgroundChromeLowBrush}">
             <StackPanel Orientation="Horizontal" Spacing="16">
                 <TextBlock Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                           FontSize="11"
+                           FontSize="12"
                            VerticalAlignment="Center"
                            FontFamily="Cascadia Code, Consolas"/>
             </StackPanel>
