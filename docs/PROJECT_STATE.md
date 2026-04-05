@@ -13,8 +13,8 @@ Build a cross-platform visual tree inspector (like WPF Snoop) for Uno Platform d
 * **Pending:** Color picker editor, enum dropdown editor, visual preview (RenderTargetBitmap), Linux target.
 
 ## 📝 Recent Progress
-* Migrated Snaipe.Inspector to XAML + MVVM (UserControl-per-pane, single MainViewModel).
-* Added SampleViewModel + XAML layout to SampleApp covering all ValueKind variants (bool, number, string, color/brush, enum, object).
+* Migrated the simulated ListView property grid to use `CommunityToolkit.WinUI.UI.Controls.DataGrid`.
+* Implemented native Category grouping using a custom `PropertyCategoryGroup` observable collection.
 * Verified full integration loop: connect, tree, select, properties, edit, disconnect, reconnect.
 
 ## 🚧 Next Steps
