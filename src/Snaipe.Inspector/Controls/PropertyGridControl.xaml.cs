@@ -1,6 +1,8 @@
 // src/Snaipe.Inspector/Controls/PropertyGridControl.xaml.cs
+using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Data;
 using Snaipe.Inspector.ViewModels;
 
 namespace Snaipe.Inspector.Controls;
@@ -36,4 +38,20 @@ public sealed partial class PropertyGridControl : UserControl
         if (ViewModel is { } vm)
             vm.SearchText = SearchBox.Text;
     }
+}
+
+public class BoolToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language) =>
+        (value is bool b && b) ? Visibility.Visible : Visibility.Collapsed;
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
+}
+
+public class BoolToOpacityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language) =>
+        (value is bool b && b) ? 0.6 : 1.0;
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotImplementedException();
 }
