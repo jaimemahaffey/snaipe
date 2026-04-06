@@ -11,12 +11,16 @@
         <local:BoolToVisibilityConverter x:Key="BoolToVisConverter"/>
         <local:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
 
-        <CollectionViewSource x:Key="GroupedItems" Source="{x:Bind ViewModel.FilteredProperties, Mode=OneWay}" IsSourceGrouped="True" />
-
+        <!--
+            Editor templates use {Binding} (not {x:Bind}) so that Uno's DataGrid can resolve the
+            DataContext at runtime regardless of how the CVS-grouped ICollectionView delivers items.
+            {x:Bind} with x:DataType inside a DataGrid CellTemplate can silently fail in Uno/Skia
+            when the DataContext is delivered as 'object' through the grouping layer.
+        -->
         <local:PropertyEditorTemplateSelector x:Key="EditorSelector">
             <local:PropertyEditorTemplateSelector.ReadOnlyTemplate>
-                <DataTemplate x:DataType="vm:PropertyRowViewModel">
-                    <TextBlock Text="{x:Bind Entry.Value}"
+                <DataTemplate>
+                    <TextBlock Text="{Binding Entry.Value}"
                                FontSize="12"
                                TextTrimming="CharacterEllipsis"
                                VerticalAlignment="Center"/>
@@ -24,24 +28,24 @@
             </local:PropertyEditorTemplateSelector.ReadOnlyTemplate>
 
             <local:PropertyEditorTemplateSelector.TextTemplate>
-                <DataTemplate x:DataType="vm:PropertyRowViewModel">
-                    <TextBox Text="{x:Bind EditValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                <DataTemplate>
+                    <TextBox Text="{Binding EditValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              FontSize="12"
-                             BorderBrush="{x:Bind ErrorBorderBrush, Mode=OneWay}"
+                             BorderBrush="{Binding ErrorBorderBrush, Mode=OneWay}"
                              BorderThickness="1"
                              ToolTipService.ToolTip="{Binding ErrorMessage}"/>
                 </DataTemplate>
             </local:PropertyEditorTemplateSelector.TextTemplate>
 
             <local:PropertyEditorTemplateSelector.BooleanTemplate>
-                <DataTemplate x:DataType="vm:PropertyRowViewModel">
-                    <CheckBox IsChecked="{x:Bind IsCheckedValue, Mode=TwoWay}"
+                <DataTemplate>
+                    <CheckBox IsChecked="{Binding IsCheckedValue, Mode=TwoWay}"
                               VerticalAlignment="Center"/>
                 </DataTemplate>
             </local:PropertyEditorTemplateSelector.BooleanTemplate>
 
             <local:PropertyEditorTemplateSelector.NumberTemplate>
-                <DataTemplate x:DataType="vm:PropertyRowViewModel">
+                <DataTemplate>
                     <NumberBox Value="{Binding NumberValue, Mode=TwoWay}"
                                SpinButtonPlacementMode="Compact"
                                FontSize="12"/>
@@ -49,7 +53,7 @@
             </local:PropertyEditorTemplateSelector.NumberTemplate>
 
             <local:PropertyEditorTemplateSelector.EnumTemplate>
-                <DataTemplate x:DataType="vm:PropertyRowViewModel">
+                <DataTemplate>
                     <ComboBox ItemsSource="{Binding Entry.EnumValues}"
                               SelectedItem="{Binding EditValue, Mode=TwoWay}"
                               FontSize="12"/>
@@ -118,9 +122,9 @@
                  FontSize="12"
                  Margin="4,4,4,2"/>
 
-        <!-- Property rows -->
-        <controls:DataGrid Grid.Row="2"
-                           ItemsSource="{Binding Source={StaticResource GroupedItems}}"
+        <!-- Property rows — ItemsSource is set imperatively in code-behind via GroupedItemsCvs -->
+        <controls:DataGrid x:Name="PropertyDataGrid"
+                           Grid.Row="2"
                            AutoGenerateColumns="False"
                            CanUserSortColumns="True"
                            CanUserReorderColumns="False"
@@ -128,56 +132,59 @@
                            HeadersVisibility="Column"
                            GridLinesVisibility="Horizontal"
                            SelectionMode="Single"
-                           RowDetailsVisibilityMode="Collapsed">
+                           RowDetailsVisibilityMode="Collapsed"
+                           RowHeight="28">
             <controls:DataGrid.RowGroupHeaderStyles>
                 <Style TargetType="controls:DataGridRowGroupHeader">
                     <Setter Property="Background" Value="#1E293B"/>
                     <Setter Property="Foreground" Value="#9CA3AF"/>
                     <Setter Property="FontSize" Value="11"/>
                     <Setter Property="FontWeight" Value="SemiBold"/>
+                    <!-- Hide the hardcoded "Group" prefix; PropertyValue carries the category name -->
+                    <Setter Property="PropertyNameVisibility" Value="Collapsed"/>
                 </Style>
             </controls:DataGrid.RowGroupHeaderStyles>
             <controls:DataGrid.Columns>
                 <!-- Name Column (Includes drill-down controls and lock icon) -->
                 <controls:DataGridTemplateColumn Header="NAME" Width="2*">
                     <controls:DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate x:DataType="vm:PropertyRowViewModel">
+                        <DataTemplate>
                             <Grid Padding="4,2">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                
-                                <TextBlock Grid.Column="0" 
-                                           Text="🔒" 
-                                           FontSize="10" 
-                                           Foreground="#9CA3AF" 
-                                           VerticalAlignment="Center" 
+
+                                <TextBlock Grid.Column="0"
+                                           Text="🔒"
+                                           FontSize="10"
+                                           Foreground="#9CA3AF"
+                                           VerticalAlignment="Center"
                                            Margin="0,0,4,0"
-                                           Visibility="{x:Bind Entry.IsReadOnly, Converter={StaticResource BoolToVisConverter}}"/>
-                                           
+                                           Visibility="{Binding Entry.IsReadOnly, Converter={StaticResource BoolToVisConverter}}"/>
+
                                 <TextBlock Grid.Column="1"
-                                           Text="{x:Bind Entry.Name}"
+                                           Text="{Binding Entry.Name}"
                                            FontSize="12"
                                            VerticalAlignment="Center"
                                            TextTrimming="CharacterEllipsis"
-                                           Opacity="{x:Bind Entry.IsReadOnly, Converter={StaticResource BoolToOpacityConverter}}"/>
-                                           
-                                <StackPanel Grid.Column="2" 
+                                           Opacity="{Binding Entry.IsReadOnly, Converter={StaticResource BoolToOpacityConverter}}"/>
+
+                                <StackPanel Grid.Column="2"
                                             Orientation="Horizontal"
                                             VerticalAlignment="Center">
                                     <Button Content="?"
-                                            Visibility="{x:Bind ShowValueChainVisibility}"
-                                            Command="{x:Bind ShowValueChainCommand}"
+                                            Visibility="{Binding ShowValueChainVisibility}"
+                                            Command="{Binding ShowValueChainCommand}"
                                             Style="{StaticResource ChevronButtonStyle}"/>
                                     <Button Content="↗"
-                                            Visibility="{x:Bind JumpToTemplateVisibility}"
-                                            Command="{x:Bind JumpToTemplateCommand}"
+                                            Visibility="{Binding JumpToTemplateVisibility}"
+                                            Command="{Binding JumpToTemplateCommand}"
                                             Style="{StaticResource ChevronButtonStyle}"/>
                                     <Button Content="›"
-                                            Visibility="{x:Bind DrillVisibility}"
-                                            Command="{x:Bind DrillCommand}"
+                                            Visibility="{Binding DrillVisibility}"
+                                            Command="{Binding DrillCommand}"
                                             Style="{StaticResource ChevronButtonStyle}"/>
                                 </StackPanel>
                             </Grid>
@@ -188,8 +195,8 @@
                 <!-- Value Column -->
                 <controls:DataGridTemplateColumn Header="VALUE" Width="2*">
                     <controls:DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate x:DataType="vm:PropertyRowViewModel">
-                            <ContentPresenter Content="{x:Bind}"
+                        <DataTemplate>
+                            <ContentPresenter Content="{Binding}"
                                               ContentTemplateSelector="{StaticResource EditorSelector}"
                                               Margin="4,2"/>
                         </DataTemplate>
@@ -202,7 +209,7 @@
         </controls:DataGrid>
 
         <!-- Value chain panel — visible when a ? button is active -->
-        <Grid Grid.Row="4"
+        <Grid Grid.Row="3"
               Visibility="{x:Bind ViewModel.ValueChainPanelVisibility, Mode=OneWay}"
               BorderBrush="#2563EB"
               BorderThickness="0,2,0,0"

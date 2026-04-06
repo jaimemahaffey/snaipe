@@ -2,13 +2,15 @@ using System.Collections.ObjectModel;
 
 namespace Snaipe.Inspector.ViewModels;
 
-public class PropertyCategoryGroup : ObservableCollection<PropertyRowViewModel>
+public class PropertyCategoryGroup : ObservableCollection<PropertyRowViewModel>, IGrouping<string, PropertyRowViewModel>
 {
     public string Key { get; }
     public PropertyCategoryGroup(string key, IEnumerable<PropertyRowViewModel> items) : base(items)
     {
         Key = key;
     }
+
+    public override string ToString() => Key;
 }
 
 public sealed class PropertyGridViewModel : ViewModelBase
@@ -17,7 +19,7 @@ public sealed class PropertyGridViewModel : ViewModelBase
     private string _searchText = "";
     private string _activeSortColumn = "Category";
     private bool _sortAscending = true;
-    
+
     private PropertyRowViewModel? _activeChainRow;
     private ValueChainEntryViewModel[]? _activeValueChain;
     private string? _valueChainPropertyName;
@@ -27,7 +29,12 @@ public sealed class PropertyGridViewModel : ViewModelBase
         ClearValueChainCommand = new RelayCommand(ClearValueChain);
     }
 
-    public ObservableCollection<PropertyCategoryGroup> FilteredProperties { get; } = [];
+    private ObservableCollection<PropertyCategoryGroup> _filteredProperties = [];
+    public ObservableCollection<PropertyCategoryGroup> FilteredProperties
+    {
+        get => _filteredProperties;
+        private set => SetField(ref _filteredProperties, value);
+    }
 
     public string SearchText
     {
@@ -84,6 +91,12 @@ public sealed class PropertyGridViewModel : ViewModelBase
         ValueChainPropertyName = null;
     }
 
+    /// <summary>
+    /// Fires after <see cref="FilteredProperties"/> has been fully rebuilt or cleared,
+    /// so the view layer can reassign the CollectionViewSource exactly once per logical update.
+    /// </summary>
+    public event EventHandler? PropertiesRebuilt;
+
     public void Load(IEnumerable<PropertyRowViewModel> rows)
     {
         _allProperties = rows.ToList();
@@ -93,8 +106,9 @@ public sealed class PropertyGridViewModel : ViewModelBase
     public void Clear()
     {
         _allProperties.Clear();
-        FilteredProperties.Clear();
+        FilteredProperties = [];
         ClearValueChain();
+        PropertiesRebuilt?.Invoke(this, EventArgs.Empty);
     }
 
     private void RebuildFilteredProperties()
@@ -117,14 +131,14 @@ public sealed class PropertyGridViewModel : ViewModelBase
         var grouped = sorted.GroupBy(r => r.Entry.Category ?? "Other")
                             .OrderBy(g => CategoryOrder(g.Key));
 
-        FilteredProperties.Clear();
+        var newCollection = new ObservableCollection<PropertyCategoryGroup>();
         foreach (var group in grouped)
-        {
-            FilteredProperties.Add(new PropertyCategoryGroup(group.Key, group));
-        }
+            newCollection.Add(new PropertyCategoryGroup(group.Key, group));
+        FilteredProperties = newCollection;
+        PropertiesRebuilt?.Invoke(this, EventArgs.Empty);
     }
 
-    private static int CategoryOrder(string category) => category switch
+    private static int CategoryOrder(string? category) => category switch
     {
         "Common"        => 0,
         "Layout"        => 1,
