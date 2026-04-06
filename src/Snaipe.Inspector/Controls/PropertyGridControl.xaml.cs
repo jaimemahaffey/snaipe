@@ -9,11 +9,65 @@ namespace Snaipe.Inspector.Controls;
 
 public sealed partial class PropertyGridControl : UserControl
 {
+    private PropertyGridViewModel? _subscribedVm;
+
     public PropertyGridControl()
     {
         InitializeComponent();
-        DataContextChanged += (_, _) => Bindings.Update();
+
+        // The Uno DataGrid's FEATURE_ICOLLECTIONVIEW_GROUP block is compiled out, so PropertyName
+        // and PropertyValue are never set automatically for pre-grouped sources.
+        // Set PropertyValue here from the ICollectionViewGroup.Group object (our PropertyCategoryGroup
+        // whose ToString() returns the category key).
+        PropertyDataGrid.LoadingRowGroup += (s, e) =>
+            e.RowGroupHeader.PropertyValue = e.RowGroupHeader.CollectionViewGroup?.Group?.ToString();
+
+        DataContextChanged += OnDataContextChanged;
         SearchBox.TextChanged += OnSearchTextChanged;
+    }
+
+    private void OnDataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+    {
+        if (_subscribedVm is { } old)
+            old.PropertiesRebuilt -= OnPropertiesRebuilt;
+
+        Bindings.Update();
+
+        _subscribedVm = ViewModel;
+
+        if (_subscribedVm is { } vm)
+        {
+            vm.PropertiesRebuilt += OnPropertiesRebuilt;
+            RefreshDataGridSource(vm);
+        }
+        else
+        {
+            PropertyDataGrid.ItemsSource = null;
+        }
+    }
+
+    private void OnPropertiesRebuilt(object? sender, EventArgs e)
+    {
+        if (_subscribedVm is { } vm)
+            RefreshDataGridSource(vm);
+    }
+
+    private void RefreshDataGridSource(PropertyGridViewModel vm)
+    {
+        // Tear down the old visual tree first so stale group headers don't linger.
+        PropertyDataGrid.ItemsSource = null;
+
+        if (vm.FilteredProperties.Count == 0) return;
+
+        // Build a brand-new CVS each time so the DataGrid receives a fresh ICollectionView.
+        // Reusing a single CVS and re-setting Source to the same ObservableCollection reference
+        // can leave Uno's DataGrid with stale rows whose DataContext was never updated.
+        var cvs = new CollectionViewSource
+        {
+            Source = vm.FilteredProperties,
+            IsSourceGrouped = true,
+        };
+        PropertyDataGrid.ItemsSource = cvs.View;
     }
 
     // DataContext is PropertyGridViewModel (set from MainWindow via x:Bind ViewModel.PropertyGrid).

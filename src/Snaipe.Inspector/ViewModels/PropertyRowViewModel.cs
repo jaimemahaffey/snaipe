@@ -35,6 +35,9 @@ public sealed class PropertyRowViewModel : ViewModelBase
 
     public PropertyEntry Entry { get; }
 
+    /// <summary>Flat category accessor for AdvancedCollectionView PropertyGroupDescription.</summary>
+    public string Category => Entry.Category ?? "Other";
+
     public string EditValue
     {
         get => _editValue;
