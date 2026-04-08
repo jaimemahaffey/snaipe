@@ -2,31 +2,31 @@
 
 The visual tree inspector for [Uno Platform](https://platform.uno/) Desktop.
 
-![Hero Screenshot](docs/screenshots/inspector.png)
+![Snaipe Inspector Main Window](docs/screenshots/hero-shot.png)
 
 Snaipe is a cross-platform debugging tool for Uno developers. Inspect trees, edit properties, and debug bindings in real-time on Windows and Linux. Think [Snoop WPF](https://github.com/snoopwpf/snoopwpf) or [WPF Inspector](https://wpfinspector.codeplex.com/), but for Uno Desktop targets using the Skia renderer.
 
-## Visual Tree Explorer
+## Features
+
+### Visual Tree Explorer
 Browse the live UI element hierarchy of any running Uno Skia Desktop app. Easily navigate complex trees and search for specific elements.
 
-![Tree Explorer Screenshot](docs/screenshots/tree-explorer.png)
+![Visual Tree Explorer](docs/screenshots/tree-explorer.png)
 
-## DataContext Drilldown
+### DataContext Drilldown
 Inspect the live ViewModel and data bindings for any element in the tree. Reveal the source of your data instantly.
 
-![DataContext Drilldown Screenshot](docs/screenshots/datacontext.png)
+![DataContext Drilldown](docs/screenshots/datacontext.png)
 
 > **Pro Tip:** Debug binding issues in seconds by seeing the live state of your ViewModel directly in the inspector.
 
-## Live Property Editor
+### Live Property Editor
 Inspect and edit dependency properties, attached properties, and bindings in real-time. See your changes reflected instantly in the running app.
 
-![Property Editor Screenshot](docs/screenshots/property-editor.png)
-
-## Pick Mode
+### Pick Mode
 Point and click on any element in your application to automatically locate and select it within the Snaipe inspector.
 
-![Pick Mode Screenshot](docs/screenshots/pick-mode.png)
+![Pick Mode](docs/screenshots/pick-mode.png)
 
 ## Quick Start
 
@@ -61,7 +61,7 @@ graph LR
     subgraph "Target App"
         A[Uno UI] --- B[Snaipe.Agent]
     end
-    B <--- "Protocol (TCP/Pipes)" ---> C[Snaipe.Inspector]
+    B -- "Protocol (TCP/Pipes)" --> C[Snaipe.Inspector]
 ```
 
 - **Snaipe.Agent:** A small library that walks the Uno visual tree and listens for commands.
